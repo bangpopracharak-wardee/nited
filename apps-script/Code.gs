@@ -38,6 +38,11 @@ const QUALITY_LEVELS = {
 // Web App Entry Points
 // ============================================================
 
+function doOptions(e) {
+  return ContentService.createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
 function doGet(e) {
   const page = e.parameter.page || 'index';
   const template = HtmlService.createTemplateFromFile(page);

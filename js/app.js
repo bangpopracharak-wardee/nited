@@ -24,12 +24,13 @@ function apiPost(action, data) {
     } else {
       fetch(CONFIG.APPS_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action, ...data })
       })
-      .then(r => r.json())
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
       .then(resolve)
       .catch(reject);
     }
