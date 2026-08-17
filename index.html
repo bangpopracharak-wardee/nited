@@ -232,7 +232,13 @@
           </div>
           <div class="form-group">
             <label>รหัสผ่าน</label>
-            <input type="password" class="form-control" id="loginPassword" placeholder="กรอกรหัสผ่าน">
+            <div class="input-password-wrap">
+              <input type="password" class="form-control" id="loginPassword" placeholder="กรอกรหัสผ่าน">
+              <button type="button" class="btn-toggle-pw" onclick="togglePassword('loginPassword', this)">&#128065;</button>
+            </div>
+          </div>
+          <div class="login-remember">
+            <label class="check-label"><input type="checkbox" id="loginRemember"> จำรหัสผ่าน</label>
           </div>
           <div class="login-error" id="loginError" style="display:none;"></div>
           <button class="btn btn-primary" style="width:100%;" onclick="handleIndexLogin()">เข้าสู่ระบบ</button>
@@ -245,6 +251,37 @@
   <script src="js/app.js"></script>
   <script>
     // Update navbar based on auth state
+    function togglePassword(inputId, btn) {
+      var input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '&#128064;';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '&#128065;';
+      }
+    }
+
+    function loadSavedLogin() {
+      var saved = localStorage.getItem('nited_saved_login');
+      if (saved) {
+        try {
+          var d = JSON.parse(saved);
+          document.getElementById('loginUsername').value = d.username || '';
+          document.getElementById('loginPassword').value = d.password || '';
+          document.getElementById('loginRemember').checked = true;
+        } catch(e) {}
+      }
+    }
+
+    function saveLogin(username, password) {
+      localStorage.setItem('nited_saved_login', JSON.stringify({username: username, password: password}));
+    }
+
+    function clearSavedLogin() {
+      localStorage.removeItem('nited_saved_login');
+    }
+
     function updatePublicNavbar() {
       var isLoggedIn = checkAuth();
       var userInfoDiv = document.getElementById('userInfoDiv');
@@ -291,6 +328,11 @@
           if (result.success) {
             APP.user = result.user;
             localStorage.setItem('nited_user', JSON.stringify(result.user));
+            if (document.getElementById('loginRemember').checked) {
+              saveLogin(username, password);
+            } else {
+              clearSavedLogin();
+            }
             closeModal('loginModal');
             updatePublicNavbar();
             showToast('เข้าสู่ระบบสำเร็จ');
@@ -397,6 +439,7 @@
 
     // Init
     updatePublicNavbar();
+    loadSavedLogin();
     calendarDate = new Date();
     loadCalendarEvents('dashboardCalendar');
     loadDashboard();
