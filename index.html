@@ -254,7 +254,7 @@
       if (isLoggedIn && APP.user) {
         userInfoDiv.style.display = '';
         document.getElementById('userName').textContent = APP.user.fullName;
-        document.getElementById('userRole').textContent = APP.user.role === 'admin' ? 'ผู้ดูแลระบบ' : APP.user.role;
+        document.getElementById('userRole').textContent = (APP.user.role === 'admin' || APP.user.role === 'supervisor') ? 'ผู้ดูแลระบบ' : APP.user.role;
         btnLogin.style.display = 'none';
         btnLogout.style.display = '';
       } else {
@@ -264,7 +264,7 @@
       }
 
       document.querySelectorAll('.admin-only').forEach(function(el) {
-        el.style.display = APP.user && APP.user.role === 'admin' ? '' : 'none';
+        el.style.display = APP.user && (APP.user.role === 'admin' || APP.user.role === 'supervisor') ? '' : 'none';
       });
       document.querySelectorAll('.auth-only').forEach(function(el) {
         el.style.display = isLoggedIn ? '' : 'none';

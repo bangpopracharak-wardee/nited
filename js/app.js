@@ -99,14 +99,18 @@ function logout() {
   window.location.href = root + 'index.html';
 }
 
+function isAdmin() {
+  return APP.user && (APP.user.role === 'admin' || APP.user.role === 'supervisor');
+}
+
 function updateUserUI() {
   const nameEl = document.getElementById('userName');
   const roleEl = document.getElementById('userRole');
   if (nameEl && APP.user) nameEl.textContent = APP.user.fullName;
-  if (roleEl && APP.user) roleEl.textContent = APP.user.role === 'admin' ? 'ผู้ดูแลระบบ' : APP.user.role;
+  if (roleEl && APP.user) roleEl.textContent = isAdmin() ? 'ผู้ดูแลระบบ' : APP.user.role;
 
   document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = APP.user && APP.user.role === 'admin' ? '' : 'none';
+    el.style.display = isAdmin() ? '' : 'none';
   });
 }
 
