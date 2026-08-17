@@ -49,6 +49,7 @@
         <button class="tab-btn" data-tab="checkFiles" onclick="switchTab('adminTab', 'checkFiles')">&#128194; ตรวจผลงาน</button>
         <button class="tab-btn" data-tab="manageEval" onclick="switchTab('adminTab', 'manageEval')">&#11088; จัดการประเมิน</button>
         <button class="tab-btn" data-tab="printReport" onclick="switchTab('adminTab', 'printReport')">&#128424; พิมพ์รายงาน</button>
+        <button class="tab-btn" data-tab="manageUsers" onclick="switchTab('adminTab', 'manageUsers');loadAdminUsers();">&#128101; จัดการผู้ใช้</button>
       </div>
     </div>
 
@@ -232,7 +233,39 @@
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Manage Users Tab -->
+    <div class="tab-content" data-tab-content="manageUsers">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#128101; รายชื่อผู้ใช้ทั้งหมด</h3>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">&#10010; เพิ่มผู้ใช้</button>
+            <button class="btn btn-sm btn-outline" onclick="loadAdminUsers()">&#128260; รีเฟรช</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>ชื่อผู้ใช้</th>
+                  <th>ชื่อ-นามสกุล</th>
+                  <th>บทบาท</th>
+                  <th>กลุ่มสาระ</th>
+                  <th>สถานะ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTable">
+                <tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
   <!-- Review File Modal -->
   <div class="modal-overlay" id="reviewFileModal">
@@ -292,16 +325,132 @@
     </div>
   </div>
 
+  <!-- Add User Modal -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>&#10010; เพิ่มผู้ใช้ใหม่</h3>
+        <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>ชื่อผู้ใช้ <span class="required">*</span></label>
+            <input type="text" class="form-control" id="addUsername" placeholder="เช่น teacher09">
+          </div>
+          <div class="form-group">
+            <label>รหัสผ่าน <span class="required">*</span></label>
+            <input type="text" class="form-control" id="addPassword" placeholder="กรอกรหัสผ่าน">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ชื่อ-นามสกุล <span class="required">*</span></label>
+          <input type="text" class="form-control" id="addFullName" placeholder="กรอกชื่อ-นามสกุล">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>บทบาท</label>
+            <select class="form-control" id="addRole">
+              <option value="teacher">ครูผู้สอน</option>
+              <option value="supervisor">ผู้นิเทศ</option>
+              <option value="admin">ผู้ดูแลระบบ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>กลุ่มสาระ</label>
+            <select class="form-control" id="addDepartment">
+              <option value="">-- เลือกกลุ่มสาระ --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveAddUser()">&#128190; บันทึก</button>
+        <button class="btn btn-outline" onclick="closeModal('addUserModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" id="editUserModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>&#9998; แก้ไขผู้ใช้</h3>
+        <button class="modal-close" onclick="closeModal('editUserModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserRow">
+        <div class="form-group">
+          <label>ชื่อผู้ใช้</label>
+          <input type="text" class="form-control" id="editUsernameDisplay" disabled>
+        </div>
+        <div class="form-group">
+          <label>รหัสผ่านใหม่ (เว้นว่างถ้าไม่เปลี่ยน)</label>
+          <input type="text" class="form-control" id="editPasswordNew" placeholder="ปล่อยว่างถ้าไม่เปลี่ยน">
+        </div>
+        <div class="form-group">
+          <label>ชื่อ-นามสกุล</label>
+          <input type="text" class="form-control" id="editFullName">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>บทบาท</label>
+            <select class="form-control" id="editRole">
+              <option value="teacher">ครูผู้สอน</option>
+              <option value="supervisor">ผู้นิเทศ</option>
+              <option value="admin">ผู้ดูแลระบบ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>กลุ่มสาระ</label>
+            <select class="form-control" id="editDepartment">
+              <option value="">-- เลือกกลุ่มสาระ --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveEditUser()">&#128190; บันทึก</button>
+        <button class="btn btn-outline" onclick="closeModal('editUserModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete User Modal -->
+  <div class="modal-overlay" id="confirmDeleteUserModal">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h3>&#9888; ยืนยันการลบ</h3>
+        <button class="modal-close" onclick="closeModal('confirmDeleteUserModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteUserMsg">ต้องการลบผู้ใช้นี้?</p>
+        <p style="color:#e74c3c;font-size:13px;">การลบจะไม่กระทบต่อข้อมูลการจอง ไฟล์ หรือผลประเมินที่ผู้ใช้นี้เคยทำไว้</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="confirmDeleteUser()">&#128465; ลบ</button>
+        <button class="btn btn-outline" onclick="closeModal('confirmDeleteUserModal')">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/config.js"></script>
   <script src="../js/app.js"></script>
   <script>
     if (!checkAuth()) { window.location.href = '../index.html'; }
     var currentReviewFile = null;
     var DEPARTMENTS = ['คณิตศาสตร์','วิทยาศาสตร์','ภาษาไทย','ภาษาอังกฤษ','สังคมศึกษา','พลศึกษา','ศิลปะ','การงานอาชีพ','เทคโนโลยี'];
+    var pendingDeleteUserRow = null;
 
     function initAdmin() {
       var ds = document.getElementById('reportDept');
       DEPARTMENTS.forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;ds.appendChild(o);});
+      var addDs = document.getElementById('addDepartment');
+      var editDs = document.getElementById('editDepartment');
+      DEPARTMENTS.forEach(function(d){
+        var o1=document.createElement('option');o1.value=d;o1.textContent=d;addDs.appendChild(o1);
+        var o2=document.createElement('option');o2.value=d;o2.textContent=d;editDs.appendChild(o2);
+      });
       apiPost('getTeachers',{}).then(function(r){if(r.success&&r.teachers){var s=document.getElementById('reportTeacher');r.teachers.forEach(function(t){var o=document.createElement('option');o.value=t;o.textContent=t;s.appendChild(o);});}}).catch(function(e){console.error(e);});
     }
 
@@ -364,6 +513,104 @@
     function printGeneralReport(){var sd=document.getElementById('reportStartDate').value;var ed=document.getElementById('reportEndDate').value;apiPost('getReport',{startDate:sd,endDate:ed}).then(function(r){if(!r.success)return;var rp=r.report;var c='<p>ช่วง: '+(sd?formatDate(sd):'ทั้งหมด')+' - '+(ed?formatDate(ed):'ทั้งหมด')+'</p><table><thead><tr><th>วันที่</th><th>ครู</th><th>วิชา</th><th>สถานะ</th></tr></thead><tbody>';rp.bookings.forEach(function(b){c+='<tr><td>'+formatDate(b.date)+'</td><td>'+escapeHtml(b.teacherName)+'</td><td>'+escapeHtml(b.subjectName)+'</td><td>'+getStatusBadge(b.status)+'</td></tr>';});c+='</tbody></table>';printReport('รายงานสรุปภาพรวม',c);});}
 
     function showQuickStats(type){apiPost('getDashboardStats',{}).then(function(r){if(!r.success)return;var s=r.stats;var c='';if(type==='bookings'){c='<h3>สถิติการจอง</h3><table><thead><tr><th>สถานะ</th><th>จำนวน</th></tr></thead><tbody><tr><td>รอดำเนินการ</td><td>'+s.pendingBookings+'</td></tr><tr><td>ยืนยันแล้ว</td><td>'+s.confirmedBookings+'</td></tr><tr><td>นิเทศแล้ว</td><td>'+s.completedBookings+'</td></tr><tr><td>ปฏิเสธ</td><td>'+s.rejectedBookings+'</td></tr><tr><td><strong>รวม</strong></td><td><strong>'+s.totalBookings+'</strong></td></tr></tbody></table>';}else if(type==='files'){c='<h3>สถิติไฟล์งาน</h3><table><thead><tr><th>สถานะ</th><th>จำนวน</th></tr></thead><tbody><tr><td>รอตรวจสอบ</td><td>'+s.pendingFiles+'</td></tr><tr><td>ผ่าน</td><td>'+s.approvedFiles+'</td></tr><tr><td>ขอแก้ไข</td><td>'+s.reviseFiles+'</td></tr><tr><td><strong>รวม</strong></td><td><strong>'+s.totalFiles+'</strong></td></tr></tbody></table>';}else if(type==='evaluations'){c='<h3>สถิติการประเมิน</h3><table><thead><tr><th>ระดับ</th><th>จำนวน</th></tr></thead><tbody><tr><td>ดีมาก</td><td>'+s.excellentCount+'</td></tr><tr><td>ดี</td><td>'+s.goodCount+'</td></tr><tr><td>พอใช้</td><td>'+s.fairCount+'</td></tr><tr><td>ปรับปรุง</td><td>'+s.poorCount+'</td></tr><tr><td><strong>รวม</strong></td><td><strong>'+s.totalEvaluations+'</strong></td></tr></tbody></table>';}printReport('สถิติด่วน',c);});}
+
+    function loadAdminUsers() {
+      apiPost('getUsers',{}).then(function(result){
+        var tbody=document.getElementById('adminUsersTable');
+        if(result.success&&result.users.length>0){
+          tbody.innerHTML=result.users.map(function(u,i){
+            var active=u.active===true||u.active==='true';
+            var roleLabel=u.role==='admin'?'ผู้ดูแลระบบ':u.role==='supervisor'?'ผู้นิเทศ':'ครูผู้สอน';
+            var statusBadge=active?'<span class="badge badge-completed">ใช้งาน</span>':'<span class="badge badge-rejected">ระงับ</span>';
+            var acts='<button class="btn btn-sm btn-warning" onclick="openEditUser('+u.rowNumber+',\''+escapeHtml(u.username)+'\',\''+escapeHtml(u.fullName)+'\',\''+u.role+'\',\''+escapeHtml(u.department||'')+'\')">&#9998;</button> ';
+            if(active){
+              acts+='<button class="btn btn-sm btn-danger" onclick="suspendUser('+u.rowNumber+',\''+escapeHtml(u.fullName)+'\')">&#128683; ระงับ</button>';
+            }else{
+              acts+='<button class="btn btn-sm btn-success" onclick="activateUser('+u.rowNumber+')">&#9989; เปิดใช้</button>';
+            }
+            acts+=' <button class="btn btn-sm btn-danger" onclick="deleteUserConfirm('+u.rowNumber+',\''+escapeHtml(u.fullName)+'\')">&#128465;</button>';
+            return '<tr'+(active?'':' style="opacity:0.5;"')+'><td>'+(i+1)+'</td><td>'+escapeHtml(u.username)+'</td><td>'+escapeHtml(u.fullName)+'</td><td>'+roleLabel+'</td><td>'+(escapeHtml(u.department||'-'))+'</td><td>'+statusBadge+'</td><td><div class="btn-group">'+acts+'</div></td></tr>';
+          }).join('');
+        } else { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="icon">&#128101;</div><h4>ไม่มีผู้ใช้</h4></div></td></tr>'; }
+      }).catch(function(e){console.error(e);});
+    }
+
+    function openAddUserModal() {
+      document.getElementById('addUsername').value='';
+      document.getElementById('addPassword').value='';
+      document.getElementById('addFullName').value='';
+      document.getElementById('addRole').value='teacher';
+      document.getElementById('addDepartment').value='';
+      openModal('addUserModal');
+    }
+
+    function saveAddUser() {
+      var username=document.getElementById('addUsername').value.trim();
+      var password=document.getElementById('addPassword').value.trim();
+      var fullName=document.getElementById('addFullName').value.trim();
+      var role=document.getElementById('addRole').value;
+      var department=document.getElementById('addDepartment').value;
+      if(!username||!password||!fullName){showToast('กรุณากรอกข้อมูลให้ครบถ้วน','error');return;}
+      apiPost('createUser',{username:username,password:password,fullName:fullName,role:role,department:department}).then(function(r){
+        if(r.success){showToast('สร้างผู้ใช้สำเร็จ','success');closeModal('addUserModal');loadAdminUsers();}
+        else showToast(r.message,'error');
+      }).catch(function(e){showToast('เกิดข้อผิดพลาด','error');});
+    }
+
+    function openEditUser(rn,username,fullName,role,department) {
+      document.getElementById('editUserRow').value=rn;
+      document.getElementById('editUsernameDisplay').value=username;
+      document.getElementById('editPasswordNew').value='';
+      document.getElementById('editFullName').value=fullName;
+      document.getElementById('editRole').value=role;
+      document.getElementById('editDepartment').value=department;
+      openModal('editUserModal');
+    }
+
+    function saveEditUser() {
+      var rn=parseInt(document.getElementById('editUserRow').value);
+      var password=document.getElementById('editPasswordNew').value.trim();
+      var fullName=document.getElementById('editFullName').value.trim();
+      var role=document.getElementById('editRole').value;
+      var department=document.getElementById('editDepartment').value;
+      if(!fullName){showToast('กรุณากรอกชื่อ-นามสกุล','error');return;}
+      var data={rowNumber:rn,fullName:fullName,role:role,department:department};
+      if(password!=='') data.password=password;
+      apiPost('updateUser',data).then(function(r){
+        if(r.success){showToast('อัพเดทสำเร็จ','success');closeModal('editUserModal');loadAdminUsers();}
+        else showToast(r.message,'error');
+      }).catch(function(e){showToast('เกิดข้อผิดพลาด','error');});
+    }
+
+    function suspendUser(rn,name) {
+      if(!confirm('ต้องการระงับการใช้งานของ '+name+'?'))return;
+      apiPost('toggleUserActive',{rowNumber:rn}).then(function(r){
+        if(r.success){showToast(r.message,'warning');loadAdminUsers();}
+        else showToast(r.message,'error');
+      });
+    }
+
+    function activateUser(rn) {
+      apiPost('toggleUserActive',{rowNumber:rn}).then(function(r){
+        if(r.success){showToast(r.message,'success');loadAdminUsers();}
+        else showToast(r.message,'error');
+      });
+    }
+
+    function deleteUserConfirm(rn,name) {
+      pendingDeleteUserRow=rn;
+      document.getElementById('deleteUserMsg').textContent='ต้องการลบผู้ใช้ "'+name+'" จริงหรือไม่?';
+      openModal('confirmDeleteUserModal');
+    }
+
+    function confirmDeleteUser() {
+      if(!pendingDeleteUserRow)return;
+      apiPost('deleteUser',{rowNumber:pendingDeleteUserRow}).then(function(r){
+        if(r.success){showToast('ลบผู้ใช้สำเร็จ','success');closeModal('confirmDeleteUserModal');loadAdminUsers();}
+        else showToast(r.message,'error');
+        pendingDeleteUserRow=null;
+      }).catch(function(e){showToast('เกิดข้อผิดพลาด','error');pendingDeleteUserRow=null;});
+    }
 
     updateUserUI();initAdmin();loadAdminBookings();loadAdminFiles();loadAdminEvaluations();
   </script>

@@ -80,6 +80,9 @@ function doPost(e) {
       case 'getDepartmentReport': return jsonResponse(getDepartmentReport(data));
       case 'getUsers': return jsonResponse(getUsers());
       case 'createUser': return jsonResponse(createUser(data));
+      case 'updateUser': return jsonResponse(updateUser(data));
+      case 'deleteUser': return jsonResponse(deleteUser(data));
+      case 'toggleUserActive': return jsonResponse(toggleUserActive(data));
       default: return jsonResponse({ success: false, message: 'ไม่รู้จักคำสั่ง' });
     }
   } catch (err) {
@@ -1025,6 +1028,56 @@ function getUsers() {
     }
 
     return { success: true, users: users };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
+
+function updateUser(data) {
+  try {
+    const sheet = getSheet(SHEETS.USERS);
+    const rowNum = data.rowNumber;
+    if (rowNum < 2) return { success: false, message: 'ไม่พบผู้ใช้' };
+
+    const row = sheet.getRange(rowNum, 1, 1, 6).getValues()[0];
+
+    if (data.fullName !== undefined) row[2] = data.fullName;
+    if (data.role !== undefined) row[3] = data.role;
+    if (data.department !== undefined) row[4] = data.department;
+    if (data.password !== undefined && data.password !== '') row[1] = data.password;
+
+    sheet.getRange(rowNum, 1, 1, 6).setValues([row]);
+
+    return { success: true, message: 'อัพเดทผู้ใช้สำเร็จ' };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
+
+function deleteUser(data) {
+  try {
+    const sheet = getSheet(SHEETS.USERS);
+    const rowNum = data.rowNumber;
+    if (rowNum < 2) return { success: false, message: 'ไม่พบผู้ใช้' };
+
+    sheet.deleteRow(rowNum);
+    return { success: true, message: 'ลบผู้ใช้สำเร็จ' };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
+
+function toggleUserActive(data) {
+  try {
+    const sheet = getSheet(SHEETS.USERS);
+    const rowNum = data.rowNumber;
+    if (rowNum < 2) return { success: false, message: 'ไม่พบผู้ใช้' };
+
+    const currentActive = sheet.getRange(rowNum, 6).getValue();
+    const newActive = currentActive === true ? false : true;
+    sheet.getRange(rowNum, 6).setValue(newActive);
+
+    return { success: true, message: newActive ? 'เปิดใช้งานแล้ว' : 'ระงับการใช้งานแล้ว', active: newActive };
   } catch (err) {
     return { success: false, message: err.toString() };
   }
