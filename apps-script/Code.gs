@@ -78,6 +78,8 @@ function doPost(e) {
       case 'getReport': return jsonResponse(getReport(data));
       case 'getTeacherReport': return jsonResponse(getTeacherReport(data));
       case 'getDepartmentReport': return jsonResponse(getDepartmentReport(data));
+      case 'getUsers': return jsonResponse(getUsers());
+      case 'createUser': return jsonResponse(createUser(data));
       default: return jsonResponse({ success: false, message: 'ไม่รู้จักคำสั่ง' });
     }
   } catch (err) {
@@ -186,7 +188,9 @@ function login(data) {
     const rowData = sheet.getDataRange().getValues();
 
     for (let i = 1; i < rowData.length; i++) {
-      if (rowData[i][0] === username && rowData[i][1] === password && rowData[i][5] !== false) {
+      const rowUsername = String(rowData[i][0]).trim();
+      const rowPassword = String(rowData[i][1]).trim();
+      if (rowUsername === String(username).trim() && rowPassword === String(password).trim() && rowData[i][5] !== false) {
         return {
           success: true,
           user: {
