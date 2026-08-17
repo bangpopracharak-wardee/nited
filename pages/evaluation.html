@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประเมินผล - โรงเรียนนราศึกษาธิการ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <div class="logo">&#127891;</div>
+        <div>
+          <div class="brand-text">ระบบนิเทศภายใน</div>
+          <div class="brand-sub">โรงเรียนนราศึกษาธิการ</div>
+        </div>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../index.html" data-page="dashboard">&#127968; หน้าหลัก</a></li>
+        <li><a href="booking.html" data-page="booking">&#128197; จองวันนิเทศ</a></li>
+        <li><a href="files.html" data-page="files">&#128194; ส่งงาน</a></li>
+        <li><a href="evaluation.html" data-page="evaluation" class="active">&#11088; ประเมินผล</a></li>
+        <li><a href="reports.html" data-page="reports">&#128202; รายงาน</a></li>
+        <li class="admin-only"><a href="admin.html" data-page="admin">&#9881; ผู้ดูแลระบบ</a></li>
+      </ul>
+      <div class="navbar-user">
+        <div>
+          <div class="user-name" id="userName">-</div>
+          <div style="font-size:11px;opacity:0.7;" id="userRole">-</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">&#10140; ออกจากระบบ</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>&#11088; ประเมินผลการนิเทศ</h1>
+      <p>บันทึกผลการประเมิน จุดเด่น จุดพัฒนา และข้อเสนอแนะ</p>
+    </div>
+
+    <div class="grid-2-1">
+      <!-- Evaluation Form -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128221; แบบฟอร์มประเมินผล</h3>
+          </div>
+          <div class="card-body">
+            <form id="evaluationForm" onsubmit="return submitEvaluation(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>ครูที่นิเทศ <span class="required">*</span></label>
+                  <select class="form-control" id="evalTeacher" required>
+                    <option value="">-- เลือกครู --</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>วันที่นิเทศ <span class="required">*</span></label>
+                  <input type="date" class="form-control" id="evalDate" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>เชื่อมโยงกับการจอง (ถ้ามี)</label>
+                <select class="form-control" id="evalBooking">
+                  <option value="">-- ไม่เชื่อมโยง --</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>จุดเด่น <span class="required">*</span></label>
+                <textarea class="form-control" id="evalStrengths" rows="4" placeholder="จุดเด่นในการจัดการเรียนการสอน..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>จุดพัฒนา <span class="required">*</span></label>
+                <textarea class="form-control" id="evalImprovements" rows="4" placeholder="จุดที่ควรพัฒนาปรับปรุง..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>ข้อเสนอแนะ</label>
+                <textarea class="form-control" id="evalSuggestions" rows="3" placeholder="ข้อเสนอแนะเพิ่มเติม..."></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>ระดับคุณภาพ <span class="required">*</span></label>
+                  <select class="form-control" id="evalQuality" required>
+                    <option value="">-- เลือกระดับ --</option>
+                    <option value="ดีมาก">&#11088;&#11088;&#11088;&#11088; ดีมาก</option>
+                    <option value="ดี">&#11088;&#11088;&#11088; ดี</option>
+                    <option value="พอใช้">&#11088;&#11088; พอใช้</option>
+                    <option value="ปรับปรุง">&#11088; ปรับปรุง</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>คะแนน (0-100)</label>
+                  <input type="number" class="form-control" id="evalScore" min="0" max="100" placeholder="0-100">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">&#128190; บันทึกผลการประเมิน</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <!-- Quality Guide -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <h3>&#128214; เกณฑ์การประเมิน</h3>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;gap:10px;">
+              <div style="padding:10px;background:#d4edda;border-radius:8px;">
+                <div style="font-weight:600;color:#155724;">&#11088;&#11088;&#11088;&#11088; ดีมาก (80-100)</div>
+                <div style="font-size:12px;color:#155724;margin-top:4px;">มีจุดเด่นมาก ไม่มีจุดพัฒนา显著</div>
+              </div>
+              <div style="padding:10px;background:#d1ecf1;border-radius:8px;">
+                <div style="font-weight:600;color:#0c5460;">&#11088;&#11088;&#11088; ดี (60-79)</div>
+                <div style="font-size:12px;color:#0c5460;margin-top:4px;">มีจุดเด่นพอสมควร มีจุดพัฒนาเล็กน้อย</div>
+              </div>
+              <div style="padding:10px;background:#fff3cd;border-radius:8px;">
+                <div style="font-weight:600;color:#856404;">&#11088;&#11088; พอใช้ (40-59)</div>
+                <div style="font-size:12px;color:#856404;margin-top:4px;">พอมีจุดเด่น มีจุดพัฒนาพอสมควร</div>
+              </div>
+              <div style="padding:10px;background:#f8d7da;border-radius:8px;">
+                <div style="font-weight:600;color:#721c24;">&#11088; ปรับปรุง (0-39)</div>
+                <div style="font-size:12px;color:#721c24;margin-top:4px;">มีจุดพัฒนามาก ต้องปรับปรุง显著</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Evaluations -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128203; ผลประเมินล่าสุด</h3>
+          </div>
+          <div class="card-body" id="recentEvaluations">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    if (!checkAuth()) {
+      window.location.href = '../index.html';
+    }
+
+    function loadTeachers() {
+      apiPost('getTeachers', {})
+        .then(result => {
+          const select = document.getElementById('evalTeacher');
+          if (result.success && result.teachers.length > 0) {
+            result.teachers.forEach(t => {
+              const opt = document.createElement('option');
+              opt.value = t;
+              opt.textContent = t;
+              select.appendChild(opt);
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function loadBookingsForEval() {
+      apiPost('getBookings', {})
+        .then(result => {
+          const select = document.getElementById('evalBooking');
+          if (result.success && result.bookings.length > 0) {
+            result.bookings.forEach(b => {
+              const opt = document.createElement('option');
+              opt.value = b.rowNumber;
+              opt.textContent = `${formatDate(b['Date'])} - ${b['Teacher Name']} (${b['Subject Name']})`;
+              select.appendChild(opt);
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function loadRecentEvaluations() {
+      apiPost('getEvaluations', {})
+        .then(result => {
+          const container = document.getElementById('recentEvaluations');
+          if (result.success && result.evaluations.length > 0) {
+            container.innerHTML = result.evaluations.slice(0, 5).map(e => `
+              <div style="padding:10px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;">${escapeHtml(e['Teacher Name'])}</div>
+                    <div style="font-size:11px;color:#999;">${formatDate(e['Supervision Date'])}</div>
+                  </div>
+                  ${getStatusBadge(e['Quality Level'])}
+                </div>
+              </div>
+            `).join('');
+          } else {
+            container.innerHTML = '<div class="empty-state"><div class="icon">&#11088;</div><h4>ยังไม่มีผลประเมิน</h4></div>';
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function submitEvaluation(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '&#8987; กำลังบันทึก...';
+
+      const data = {
+        teacherName: document.getElementById('evalTeacher').value,
+        supervisionDate: document.getElementById('evalDate').value,
+        bookingId: document.getElementById('evalBooking').value,
+        strengths: document.getElementById('evalStrengths').value,
+        improvements: document.getElementById('evalImprovements').value,
+        suggestions: document.getElementById('evalSuggestions').value,
+        qualityLevel: document.getElementById('evalQuality').value,
+        score: document.getElementById('evalScore').value,
+        evaluatedBy: APP.user.fullName
+      };
+
+      apiPost('createEvaluation', data)
+        .then(result => {
+          if (result.success) {
+            showToast('บันทึกผลการประเมินสำเร็จ!', 'success');
+            document.getElementById('evaluationForm').reset();
+            loadRecentEvaluations();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .catch(err => {
+          showToast('เกิดข้อผิดพลาด: ' + (err.message || err), 'error');
+        });
+
+      btn.disabled = false;
+      btn.innerHTML = '&#128190; บันทึกผลการประเมิน';
+      return false;
+    }
+
+    // Init
+    updateUserUI();
+    loadTeachers();
+    loadBookingsForEval();
+    loadRecentEvaluations();
+  </script>
+</body>
+</html>

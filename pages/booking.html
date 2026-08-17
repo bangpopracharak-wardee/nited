@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จองวันนิเทศ - โรงเรียนนราศึกษาธิการ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <div class="logo">&#127891;</div>
+        <div>
+          <div class="brand-text">ระบบนิเทศภายใน</div>
+          <div class="brand-sub">โรงเรียนนราศึกษาธิการ</div>
+        </div>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../index.html" data-page="dashboard">&#127968; หน้าหลัก</a></li>
+        <li><a href="booking.html" data-page="booking" class="active">&#128197; จองวันนิเทศ</a></li>
+        <li><a href="files.html" data-page="files">&#128194; ส่งงาน</a></li>
+        <li><a href="evaluation.html" data-page="evaluation">&#11088; ประเมินผล</a></li>
+        <li><a href="reports.html" data-page="reports">&#128202; รายงาน</a></li>
+        <li class="admin-only"><a href="admin.html" data-page="admin">&#9881; ผู้ดูแลระบบ</a></li>
+      </ul>
+      <div class="navbar-user">
+        <div>
+          <div class="user-name" id="userName">-</div>
+          <div style="font-size:11px;opacity:0.7;" id="userRole">-</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">&#10140; ออกจากระบบ</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>&#128197; จองวันนิเทศ</h1>
+      <p>จองวัน-เวลานิเทศภายในสำหรับการตรวจเยี่ยมห้องเรียน</p>
+    </div>
+
+    <div class="grid-2-1">
+      <!-- Booking Form -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128221; แบบฟอร์มจองวันนิเทศ</h3>
+          </div>
+          <div class="card-body">
+            <form id="bookingForm" onsubmit="return submitBooking(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>วันที่นิเทศ <span class="required">*</span></label>
+                  <input type="date" class="form-control" id="bookDate" required min="">
+                </div>
+                <div class="form-group">
+                  <label>ช่วงเวลา <span class="required">*</span></label>
+                  <select class="form-control" id="bookTime" required onchange="updatePeriod()">
+                    <option value="">-- เลือกช่วงเวลา --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label>คาบที่ <span class="required">*</span></label>
+                  <select class="form-control" id="bookPeriod" required>
+                    <option value="">-- เลือกคาบ --</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>กลุ่มสาระ <span class="required">*</span></label>
+                  <select class="form-control" id="bookDept" required>
+                    <option value="">-- เลือกกลุ่มสาระ --</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>ระดับชั้น <span class="required">*</span></label>
+                  <select class="form-control" id="bookClass" required>
+                    <option value="">-- เลือกระดับชั้น --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>ชื่อวิชา <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="bookSubject" placeholder="ชื่อวิชา" required>
+                </div>
+                <div class="form-group">
+                  <label>รหัสวิชา</label>
+                  <input type="text" class="form-control" id="bookSubjectCode" placeholder="รหัสวิชา">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>ห้องเรียน <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="bookRoom" placeholder="เช่น ห้อง 3/1" required>
+                </div>
+                <div class="form-group">
+                  <label>ชื่อครูผู้สอน <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="bookTeacher" placeholder="ชื่อ-นามสกุล">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>หมายเหตุ</label>
+                <textarea class="form-control" id="bookNotes" rows="3" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+              </div>
+
+              <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button type="button" class="btn btn-outline" onclick="resetBookingForm()">&#128260; ล้างฟอร์ม</button>
+                <button type="submit" class="btn btn-primary btn-lg">&#128197; จองวันนิเทศ</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <!-- Calendar -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-body" style="padding:0;">
+            <div id="bookingCalendar"></div>
+          </div>
+        </div>
+
+        <!-- My Bookings -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128203; การจองของฉัน</h3>
+          </div>
+          <div class="card-body" id="myBookingsList">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="bookingDetailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>&#128197; รายละเอียดการจอง</h3>
+        <button class="modal-close" onclick="closeModal('bookingDetailModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="bookingDetailContent"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('bookingDetailModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    if (!checkAuth()) {
+      window.location.href = '../index.html';
+    }
+
+    const DEPARTMENTS = [
+      'คณิตศาสตร์', 'วิทยาศาสตร์', 'ภาษาไทย', 'ภาษาอังกฤษ',
+      'สังคมศึกษา', 'พลศึกษา', 'ศิลปะ', 'การงานอาชีพ', 'เทคโนโลยี'
+    ];
+
+    const CLASS_LEVELS = ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'];
+
+    const TIME_SLOTS = [
+      { time: '08:30-09:00', period: 'คาบที่ 1' },
+      { time: '09:00-09:30', period: 'คาบที่ 2' },
+      { time: '09:30-10:00', period: 'คาบที่ 3' },
+      { time: '10:30-11:00', period: 'คาบที่ 4' },
+      { time: '11:00-11:30', period: 'คาบที่ 5' },
+      { time: '11:30-12:00', period: 'คาบที่ 6' },
+      { time: '13:00-13:30', period: 'คาบที่ 7' },
+      { time: '13:30-14:00', period: 'คาบที่ 8' },
+      { time: '14:00-14:30', period: 'คาบที่ 9' }
+    ];
+
+    function initForm() {
+      const today = new Date();
+      const minDate = today.toISOString().split('T')[0];
+      document.getElementById('bookDate').min = minDate;
+
+      const timeSelect = document.getElementById('bookTime');
+      TIME_SLOTS.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.time;
+        opt.textContent = `${s.time} (${s.period})`;
+        timeSelect.appendChild(opt);
+      });
+
+      const deptSelect = document.getElementById('bookDept');
+      DEPARTMENTS.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        deptSelect.appendChild(opt);
+      });
+
+      const classSelect = document.getElementById('bookClass');
+      CLASS_LEVELS.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        classSelect.appendChild(opt);
+      });
+
+      const periodSelect = document.getElementById('bookPeriod');
+      for (let i = 1; i <= 9; i++) {
+        const opt = document.createElement('option');
+        opt.value = `คาบที่ ${i}`;
+        opt.textContent = `คาบที่ ${i}`;
+        periodSelect.appendChild(opt);
+      }
+
+      if (APP.user && APP.user.fullName) {
+        document.getElementById('bookTeacher').value = APP.user.fullName;
+      }
+    }
+
+    function updatePeriod() {
+      const timeVal = document.getElementById('bookTime').value;
+      const slot = TIME_SLOTS.find(s => s.time === timeVal);
+      if (slot) {
+        document.getElementById('bookPeriod').value = slot.period;
+      }
+    }
+
+    function submitBooking(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '&#8987; กำลังจอง...';
+
+      const data = {
+        date: document.getElementById('bookDate').value,
+        time: document.getElementById('bookTime').value,
+        period: document.getElementById('bookPeriod').value,
+        department: document.getElementById('bookDept').value,
+        classLevel: document.getElementById('bookClass').value,
+        subjectName: document.getElementById('bookSubject').value,
+        subjectCode: document.getElementById('bookSubjectCode').value,
+        room: document.getElementById('bookRoom').value,
+        teacherName: document.getElementById('bookTeacher').value,
+        notes: document.getElementById('bookNotes').value
+      };
+
+      apiPost('createBooking', data)
+        .then(result => {
+          if (result.success) {
+            showToast('จองวันนิเทศสำเร็จ! รอการยืนยันจากผู้ดูแลระบบ', 'success');
+            resetBookingForm();
+            loadMyBookings();
+            loadCalendarEvents('bookingCalendar');
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .catch(err => {
+          showToast('เกิดข้อผิดพลาด: ' + (err.message || err), 'error');
+        });
+
+      btn.disabled = false;
+      btn.innerHTML = '&#128197; จองวันนิเทศ';
+      return false;
+    }
+
+    function resetBookingForm() {
+      document.getElementById('bookingForm').reset();
+      if (APP.user && APP.user.fullName) {
+        document.getElementById('bookTeacher').value = APP.user.fullName;
+      }
+    }
+
+    function loadMyBookings() {
+      const teacherName = APP.user ? APP.user.fullName : '';
+      apiPost('getBookings', { teacherName: teacherName })
+        .then(result => {
+          const container = document.getElementById('myBookingsList');
+          if (result.success && result.bookings.length > 0) {
+            container.innerHTML = result.bookings.map((b, idx) => `
+              <div style="padding:10px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;cursor:pointer;" onclick="showBookingDetail(${JSON.stringify(b).replace(/"/g, '&quot;')})">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;">${escapeHtml(b['Subject Name'] || b.subjectName || '-')}</div>
+                    <div style="font-size:11px;color:#999;">${formatDate(b['Date'] || b.date)} | ${escapeHtml(b['Time'] || b.time || '')}</div>
+                  </div>
+                  ${getStatusBadge(b['Status'] || b.status || 'รอดำเนินการ')}
+                </div>
+              </div>
+            `).join('');
+          } else {
+            container.innerHTML = '<div class="empty-state"><div class="icon">&#128197;</div><h4>ยังไม่มีการจอง</h4></div>';
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function showBookingDetail(booking) {
+      const html = `
+        <div style="display:grid;gap:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><strong>วันที่:</strong> ${formatDate(booking['Date'] || booking.date)}</div>
+            <div><strong>ช่วงเวลา:</strong> ${escapeHtml(booking['Time'] || booking.time)}</div>
+            <div><strong>คาบ:</strong> ${escapeHtml(booking['Period'] || booking.period)}</div>
+            <div><strong>กลุ่มสาระ:</strong> ${escapeHtml(booking['Department'] || booking.department)}</div>
+            <div><strong>วิชา:</strong> ${escapeHtml(booking['Subject Name'] || booking.subjectName)}</div>
+            <div><strong>รหัสวิชา:</strong> ${escapeHtml(booking['Subject Code'] || booking.subjectCode || '-')}</div>
+            <div><strong>ห้อง:</strong> ${escapeHtml(booking['Room'] || booking.room)}</div>
+            <div><strong>ครู:</strong> ${escapeHtml(booking['Teacher Name'] || booking.teacherName)}</div>
+          </div>
+          <div><strong>สถานะ:</strong> ${getStatusBadge(booking['Status'] || booking.status)}</div>
+          ${booking['Notes'] || booking.notes ? `<div><strong>หมายเหตุ:</strong> ${escapeHtml(booking['Notes'] || booking.notes)}</div>` : ''}
+        </div>
+      `;
+      document.getElementById('bookingDetailContent').innerHTML = html;
+      openModal('bookingDetailModal');
+    }
+
+    // Init
+    updateUserUI();
+    initForm();
+    loadMyBookings();
+    calendarDate = new Date();
+    loadCalendarEvents('bookingCalendar');
+  </script>
+</body>
+</html>

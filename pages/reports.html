@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายงาน - โรงเรียนนราศึกษาธิการ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <div class="logo">&#127891;</div>
+        <div><div class="brand-text">ระบบนิเทศภายใน</div><div class="brand-sub">โรงเรียนนราศึกษาธิการ</div></div>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../index.html" data-page="dashboard">&#127968; หน้าหลัก</a></li>
+        <li><a href="booking.html" data-page="booking">&#128197; จองวันนิเทศ</a></li>
+        <li><a href="files.html" data-page="files">&#128194; ส่งงาน</a></li>
+        <li><a href="evaluation.html" data-page="evaluation">&#11088; ประเมินผล</a></li>
+        <li><a href="reports.html" data-page="reports" class="active">&#128202; รายงาน</a></li>
+        <li class="admin-only"><a href="admin.html" data-page="admin">&#9881; ผู้ดูแลระบบ</a></li>
+      </ul>
+      <div class="navbar-user">
+        <div><div class="user-name" id="userName">-</div><div style="font-size:11px;opacity:0.7;" id="userRole">-</div></div>
+        <button class="btn-logout" onclick="logout()">&#10140; ออกจากระบบ</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>&#128202; รายงานและสถิติ</h1>
+      <p>ดูรายงานสถิติ วิเคราะห์ผลการนิเทศ และพิมพ์เอกสาร</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon blue">&#128197;</div><div class="stat-info"><h4 id="rptTotalBookings">0</h4><p>การจองทั้งหมด</p></div></div>
+      <div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><h4 id="rptCompleted">0</h4><p>นิเทศแล้ว</p></div></div>
+      <div class="stat-card"><div class="stat-icon orange">&#128194;</div><div class="stat-info"><h4 id="rptTotalFiles">0</h4><p>ไฟล์งาน</p></div></div>
+      <div class="stat-card"><div class="stat-icon purple">&#11088;</div><div class="stat-info"><h4 id="rptTotalEval">0</h4><p>ผลประเมิน</p></div></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card"><div class="card-header"><h3>&#128202; สถิติสถานะการจอง</h3></div><div class="card-body"><div id="bookingStatusChart"></div></div></div>
+      <div class="card"><div class="card-header"><h3>&#11088; สถิติระดับคุณภาพ</h3></div><div class="card-body"><div id="qualityChart"></div></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>&#127979; สถิติกลุ่มสาระ</h3></div><div class="card-body"><div id="deptReportChart"></div></div></div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header"><h3>&#128100; สถิติครูผู้สอน</h3></div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-responsive">
+          <table><thead><tr><th>ชื่อครู</th><th>การจอง</th><th>นิเทศแล้ว</th><th>ไฟล์งาน</th></tr></thead>
+          <tbody id="teacherStatsTable"><tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card"><div class="card-header"><h3>&#128197; ปฏิทินการนิเทศ</h3></div><div class="card-body" style="padding:0;"><div id="reportCalendar"></div></div></div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    if (!checkAuth()) { window.location.href = '../index.html'; }
+
+    function makeBar(label, value, max, color) {
+      var pct = max > 0 ? (value / max) * 100 : 0;
+      return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">' +
+        '<div style="width:100px;font-size:13px;text-align:right;">' + label + '</div>' +
+        '<div style="flex:1;background:#f0f0f0;border-radius:4px;height:28px;overflow:hidden;">' +
+        '<div style="width:' + pct + '%;background:' + color + ';height:100%;display:flex;align-items:center;padding-left:8px;color:white;font-size:12px;font-weight:600;">' + value + '</div>' +
+        '</div></div>';
+    }
+
+    function loadReportStats() {
+      apiPost('getDashboardStats', {})
+        .then(function(result) {
+        if (!result.success) return;
+        var s = result.stats;
+        document.getElementById('rptTotalBookings').textContent = s.totalBookings;
+        document.getElementById('rptCompleted').textContent = s.completedBookings;
+        document.getElementById('rptTotalFiles').textContent = s.totalFiles;
+        document.getElementById('rptTotalEval').textContent = s.totalEvaluations;
+
+        var maxB = Math.max(s.pendingBookings, s.confirmedBookings, s.completedBookings, s.rejectedBookings, 1);
+        document.getElementById('bookingStatusChart').innerHTML =
+          makeBar('รอดำเนินการ', s.pendingBookings, maxB, '#f39c12') +
+          makeBar('ยืนยันแล้ว', s.confirmedBookings, maxB, '#3498db') +
+          makeBar('นิเทศแล้ว', s.completedBookings, maxB, '#27ae60') +
+          makeBar('ปฏิเสธ', s.rejectedBookings, maxB, '#e74c3c');
+
+        var maxQ = Math.max(s.excellentCount, s.goodCount, s.fairCount, s.poorCount, 1);
+        document.getElementById('qualityChart').innerHTML =
+          makeBar('ดีมาก', s.excellentCount, maxQ, '#27ae60') +
+          makeBar('ดี', s.goodCount, maxQ, '#3498db') +
+          makeBar('พอใช้', s.fairCount, maxQ, '#f39c12') +
+          makeBar('ปรับปรุง', s.poorCount, maxQ, '#e74c3c');
+
+        var dept = s.departmentStats || {};
+        var deptKeys = Object.keys(dept);
+        var maxD = 1;
+        deptKeys.forEach(function(k) { if (dept[k].total > maxD) maxD = dept[k].total; });
+        if (deptKeys.length > 0) {
+          document.getElementById('deptReportChart').innerHTML = deptKeys.map(function(k) {
+            return makeBar(k, dept[k].total, maxD, '#1a5276');
+          }).join('');
+        } else {
+          document.getElementById('deptReportChart').innerHTML = '<div class="empty-state"><p>ยังไม่มีข้อมูล</p></div>';
+        }
+
+        var teacherKeys = Object.keys(s.teacherStats || {});
+        var tbody = document.getElementById('teacherStatsTable');
+        if (teacherKeys.length > 0) {
+          tbody.innerHTML = teacherKeys.map(function(t) {
+            var ts = s.teacherStats[t];
+            return '<tr><td>' + escapeHtml(t) + '</td><td>' + ts.total + '</td><td>' + ts.completed + '</td><td>' + ts.files + '</td></tr>';
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><p>ยังไม่มีข้อมูล</p></div></td></tr>';
+        }
+      }).catch(function(e){console.error(e);});
+    }
+
+    updateUserUI();
+    calendarDate = new Date();
+    loadCalendarEvents('reportCalendar');
+    loadReportStats();
+  </script>
+</body>
+</html>

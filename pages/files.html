@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ส่งงาน - โรงเรียนนราศึกษาธิการ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <div class="logo">&#127891;</div>
+        <div>
+          <div class="brand-text">ระบบนิเทศภายใน</div>
+          <div class="brand-sub">โรงเรียนนราศึกษาธิการ</div>
+        </div>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../index.html" data-page="dashboard">&#127968; หน้าหลัก</a></li>
+        <li><a href="booking.html" data-page="booking">&#128197; จองวันนิเทศ</a></li>
+        <li><a href="files.html" data-page="files" class="active">&#128194; ส่งงาน</a></li>
+        <li><a href="evaluation.html" data-page="evaluation">&#11088; ประเมินผล</a></li>
+        <li><a href="reports.html" data-page="reports">&#128202; รายงาน</a></li>
+        <li class="admin-only"><a href="admin.html" data-page="admin">&#9881; ผู้ดูแลระบบ</a></li>
+      </ul>
+      <div class="navbar-user">
+        <div>
+          <div class="user-name" id="userName">-</div>
+          <div style="font-size:11px;opacity:0.7;" id="userRole">-</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">&#10140; ออกจากระบบ</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>&#128194; ส่งงาน/ไฟล์</h1>
+      <p>อัพโหลดไฟล์ประกอบการนิเทศ แผนการสอน สื่อการสอน ภาพกิจกรรม และคลิปวิดีโอ</p>
+    </div>
+
+    <!-- Tabs -->
+    <div data-tab-group="filesTab">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="upload" onclick="switchTab('filesTab', 'upload')">&#128228; อัพโหลดไฟล์</button>
+        <button class="tab-btn" data-tab="myfiles" onclick="switchTab('filesTab', 'myfiles')">&#128196; ไฟล์ของฉัน</button>
+        <button class="tab-btn" data-tab="allfiles" onclick="switchTab('filesTab', 'allfiles')">&#128194; ไฟล์ทั้งหมด</button>
+      </div>
+    </div>
+
+    <!-- Upload Tab -->
+    <div class="tab-content active" data-tab-content="upload">
+      <div class="grid-2">
+        <!-- Upload Form -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128228; อัพโหลดไฟล์ใหม่</h3>
+          </div>
+          <div class="card-body">
+            <form id="uploadForm" onsubmit="return submitFile(event)">
+              <div class="form-group">
+                <label>ประเภทไฟล์ <span class="required">*</span></label>
+                <select class="form-control" id="fileType" required onchange="updateFileAccept()">
+                  <option value="">-- เลือกประเภทไฟล์ --</option>
+                  <option value="แผนการสอน">&#128203; แผนการสอน (PDF/Word)</option>
+                  <option value="สื่อการสอน">&#127909; สื่อการสอน (รูปภาพ/PPT/PDF)</option>
+                  <option value="ภาพกิจกรรม">&#128247; ภาพกิจกรรม (รูปภาพ)</option>
+                  <option value="คลิปวิดีโอ">&#127909; คลิปวิดีโอ (ลิงก์ YouTube/Drive)</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="fileUrlGroup" style="display:none;">
+                <label>ลิงก์วิดีโอ <span class="required">*</span></label>
+                <input type="url" class="form-control" id="fileUrl" placeholder="https://youtube.com/watch?v=... หรือ https://drive.google.com/...">
+              </div>
+
+              <div class="form-group" id="fileUploadGroup">
+                <label>เลือกไฟล์ <span class="required">*</span></label>
+                <div class="file-upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                  <div class="icon">&#128193;</div>
+                  <p>ลากและวางไฟล์ที่นี่ หรือ <span class="browse">คลิกเพื่อเลือกไฟล์</span></p>
+                  <p style="font-size:11px;margin-top:4px;">รองรับ: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG (สูงสุด 10MB)</p>
+                </div>
+                <input type="file" id="fileInput" style="display:none;" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" onchange="handleFileSelect(this)">
+                <div id="selectedFile" style="margin-top:8px;"></div>
+              </div>
+
+              <div class="form-group">
+                <label>เชื่อมโยงกับการจอง (ถ้ามี)</label>
+                <select class="form-control" id="linkedBooking">
+                  <option value="">-- ไม่เชื่อมโยง --</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">&#128228; อัพโหลดไฟล์</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- File Type Info -->
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+              <h3>&#128196; ประเภทไฟล์ที่รับ</h3>
+            </div>
+            <div class="card-body">
+              <div style="display:grid;gap:12px;">
+                <div style="padding:12px;background:#f0f7fc;border-radius:8px;border-left:4px solid #3498db;">
+                  <div style="font-weight:600;font-size:14px;">&#128203; แผนการสอน</div>
+                  <div style="font-size:12px;color:#666;margin-top:4px;">ไฟล์ PDF, DOC, DOCX แผนการสอนรายสัปดาห์/รายวัน</div>
+                </div>
+                <div style="padding:12px;background:#f0fdf4;border-radius:8px;border-left:4px solid #27ae60;">
+                  <div style="font-weight:600;font-size:14px;">&#127909; สื่อการสอน</div>
+                  <div style="font-size:12px;color:#666;margin-top:4px;">รูปภาพ JPG/PNG, แฟ้มนำเสนอ PPT/PPTX, PDF</div>
+                </div>
+                <div style="padding:12px;background:#fef5e7;border-radius:8px;border-left:4px solid #f39c12;">
+                  <div style="font-weight:600;font-size:14px;">&#128247; ภาพกิจกรรม</div>
+                  <div style="font-size:12px;color:#666;margin-top:4px;">รูปภาพ JPG, PNG ภาพการจัดกิจกรรมการเรียนการสอน</div>
+                </div>
+                <div style="padding:12px;background:#fdf2f8;border-radius:8px;border-left:4px solid #e74c3c;">
+                  <div style="font-weight:600;font-size:14px;">&#127909; คลิปวิดีโอ</div>
+                  <div style="font-size:12px;color:#666;margin-top:4px;">ลิงก์ YouTube หรือ Google Drive</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>&#128712; คำแนะนำ</h3>
+            </div>
+            <div class="card-body">
+              <ul style="font-size:13px;color:#555;padding-left:18px;line-height:1.8;">
+                <li>อัพโหลดไฟล์ที่เกี่ยวข้องกับการนิเทศ</li>
+                <li>ไฟล์ควรมีขนาดไม่เกิน 10MB</li>
+                <li>คลิปวิดีโอให้ใส่ลิงก์จาก YouTube หรือ Google Drive</li>
+                <li>สามารถอัพโหลดไฟล์ได้หลายประเภท</li>
+                <li>รอการตรวจสอบจากผู้ดูแลระบบ</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Files Tab -->
+    <div class="tab-content" data-tab-content="myfiles">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#128196; ไฟล์ของฉัน</h3>
+          <button class="btn btn-sm btn-outline" onclick="loadMyFiles()">&#128260; รีเฟรช</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่ส่ง</th>
+                  <th>ประเภท</th>
+                  <th>ชื่อไฟล์</th>
+                  <th>สถานะ</th>
+                  <th>หมายเหตุ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="myFilesTable">
+                <tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Files Tab -->
+    <div class="tab-content" data-tab-content="allfiles">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#128194; ไฟล์ทั้งหมด</h3>
+          <div style="display:flex;gap:8px;">
+            <select class="form-control" style="width:auto;" id="filterFileType" onchange="loadAllFiles()">
+              <option value="">ทุกประเภท</option>
+              <option value="แผนการสอน">แผนการสอน</option>
+              <option value="สื่อการสอน">สื่อการสอน</option>
+              <option value="ภาพกิจกรรม">ภาพกิจกรรม</option>
+              <option value="คลิปวิดีโอ">คลิปวิดีโอ</option>
+            </select>
+            <button class="btn btn-sm btn-outline" onclick="loadAllFiles()">&#128260; รีเฟรช</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่ส่ง</th>
+                  <th>ชื่อครู</th>
+                  <th>ประเภท</th>
+                  <th>ชื่อไฟล์</th>
+                  <th>สถานะ</th>
+                  <th>ลิงก์</th>
+                </tr>
+              </thead>
+              <tbody id="allFilesTable">
+                <tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    if (!checkAuth()) {
+      window.location.href = '../index.html';
+    }
+
+    let selectedFile = null;
+
+    function updateFileAccept() {
+      const type = document.getElementById('fileType').value;
+      const fileInput = document.getElementById('fileInput');
+      const urlGroup = document.getElementById('fileUrlGroup');
+      const uploadGroup = document.getElementById('fileUploadGroup');
+
+      if (type === 'คลิปวิดีโอ') {
+        urlGroup.style.display = 'block';
+        uploadGroup.style.display = 'none';
+      } else {
+        urlGroup.style.display = 'none';
+        uploadGroup.style.display = 'block';
+
+        if (type === 'ภาพกิจกรรม' || type === 'สื่อการสอน') {
+          fileInput.accept = '.jpg,.jpeg,.png,.ppt,.pptx,.pdf';
+        } else {
+          fileInput.accept = '.pdf,.doc,.docx';
+        }
+      }
+    }
+
+    function handleFileSelect(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('ไฟล์มีขนาดใหญ่เกิน 10MB', 'error');
+        input.value = '';
+        return;
+      }
+
+      selectedFile = file;
+      document.getElementById('selectedFile').innerHTML = `
+        <div class="file-item">
+          <span>&#128196;</span>
+          <span class="file-name">${escapeHtml(file.name)}</span>
+          <span class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
+          <span class="file-remove" onclick="removeSelectedFile()">&times;</span>
+        </div>
+      `;
+    }
+
+    function removeSelectedFile() {
+      selectedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('selectedFile').innerHTML = '';
+    }
+
+    function submitFile(e) {
+      e.preventDefault();
+      const type = document.getElementById('fileType').value;
+
+      if (!type) {
+        showToast('กรุณาเลือกประเภทไฟล์', 'error');
+        return false;
+      }
+
+      if (type === 'คลิปวิดีโอ') {
+        const url = document.getElementById('fileUrl').value;
+        if (!url) {
+          showToast('กรุณาใส่ลิงก์วิดีโอ', 'error');
+          return false;
+        }
+        uploadFileData({
+          fileType: type,
+          fileUrl: url,
+          fileName: 'ลิงก์วิดีโอ',
+          teacherName: APP.user.fullName,
+          bookingId: document.getElementById('linkedBooking').value
+        });
+      } else {
+        if (!selectedFile) {
+          showToast('กรุณาเลือกไฟล์', 'error');
+          return false;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          uploadFileData({
+            fileType: type,
+            fileData: ev.target.result,
+            fileName: selectedFile.name,
+            mimeType: selectedFile.type,
+            teacherName: APP.user.fullName,
+            bookingId: document.getElementById('linkedBooking').value
+          });
+        };
+        reader.readAsDataURL(selectedFile);
+      }
+
+      return false;
+    }
+
+    function uploadFileData(data) {
+      const btn = document.querySelector('#uploadForm [type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '&#8987; กำลังอัพโหลด...';
+
+      apiPost('uploadFile', data)
+        .then(result => {
+          if (result.success) {
+            showToast('อัพโหลดไฟล์สำเร็จ!', 'success');
+            document.getElementById('uploadForm').reset();
+            removeSelectedFile();
+            loadMyFiles();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .catch(err => {
+          showToast('เกิดข้อผิดพลาด: ' + (err.message || err), 'error');
+        });
+
+      btn.disabled = false;
+      btn.innerHTML = '&#128228; อัพโหลดไฟล์';
+    }
+
+    function loadMyFiles() {
+      apiPost('getFiles', { teacherName: APP.user.fullName })
+        .then(result => {
+          const tbody = document.getElementById('myFilesTable');
+          if (result.success && result.files.length > 0) {
+            tbody.innerHTML = result.files.map(f => `
+              <tr>
+                <td>${formatDateTime(f['Timestamp'])}</td>
+                <td>${getFileTypeIcon(f['File Type'])} ${escapeHtml(f['File Type'])}</td>
+                <td>${escapeHtml(f['File Name'])}</td>
+                <td>${getStatusBadge(f['Status'])}</td>
+                <td style="font-size:12px;">${escapeHtml(f['Admin Note'] || '-')}</td>
+                <td>
+                  ${f['File URL'] ? `<a href="${f['File URL']}" target="_blank" class="btn btn-sm btn-info">&#128279; เปิด</a>` : ''}
+                </td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">&#128194;</div><h4>ยังไม่มีไฟล์งาน</h4></div></td></tr>';
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function loadAllFiles() {
+      const filterType = document.getElementById('filterFileType').value;
+      const data = filterType ? { fileType: filterType } : {};
+
+      apiPost('getFiles', data)
+        .then(result => {
+          const tbody = document.getElementById('allFilesTable');
+          if (result.success && result.files.length > 0) {
+            tbody.innerHTML = result.files.map(f => `
+              <tr>
+                <td>${formatDateTime(f['Timestamp'])}</td>
+                <td>${escapeHtml(f['Teacher Name'])}</td>
+                <td>${getFileTypeIcon(f['File Type'])} ${escapeHtml(f['File Type'])}</td>
+                <td>${escapeHtml(f['File Name'])}</td>
+                <td>${getStatusBadge(f['Status'])}</td>
+                <td>${f['File URL'] ? `<a href="${f['File URL']}" target="_blank" class="btn btn-sm btn-info">&#128279;</a>` : '-'}</td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">&#128194;</div><h4>ยังไม่มีไฟล์งาน</h4></div></td></tr>';
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function loadBookingsForLink() {
+      apiPost('getBookings', { status: 'ยืนยันแล้ว' })
+        .then(result => {
+          const select = document.getElementById('linkedBooking');
+          if (result.success && result.bookings.length > 0) {
+            result.bookings.forEach(b => {
+              const opt = document.createElement('option');
+              opt.value = b.rowNumber;
+              opt.textContent = `${formatDate(b['Date'])} - ${b['Teacher Name']} (${b['Subject Name']})`;
+              select.appendChild(opt);
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    // Drag and drop
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+      });
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          document.getElementById('fileInput').files = e.dataTransfer.files;
+          handleFileSelect(document.getElementById('fileInput'));
+        }
+      });
+    }
+
+    // Init
+    updateUserUI();
+    loadMyFiles();
+    loadAllFiles();
+    loadBookingsForLink();
+  </script>
+</body>
+</html>

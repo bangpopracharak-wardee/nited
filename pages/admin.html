@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ผู้ดูแลระบบ - โรงเรียนนราศึกษาธิการ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <div class="logo">&#127891;</div>
+        <div>
+          <div class="brand-text">ระบบนิเทศภายใน</div>
+          <div class="brand-sub">โรงเรียนนราศึกษาธิการ</div>
+        </div>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../index.html" data-page="dashboard">&#127968; หน้าหลัก</a></li>
+        <li><a href="booking.html" data-page="booking">&#128197; จองวันนิเทศ</a></li>
+        <li><a href="files.html" data-page="files">&#128194; ส่งงาน</a></li>
+        <li><a href="evaluation.html" data-page="evaluation">&#11088; ประเมินผล</a></li>
+        <li><a href="reports.html" data-page="reports">&#128202; รายงาน</a></li>
+        <li class="admin-only"><a href="admin.html" data-page="admin" class="active">&#9881; ผู้ดูแลระบบ</a></li>
+      </ul>
+      <div class="navbar-user">
+        <div>
+          <div class="user-name" id="userName">-</div>
+          <div style="font-size:11px;opacity:0.7;" id="userRole">-</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">&#10140; ออกจากระบบ</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>&#9881; ผู้ดูแลระบบ</h1>
+      <p>จัดการการจอง ตรวจสอบไฟล์ และดูแลข้อมูลทั้งหมด</p>
+    </div>
+
+    <!-- Tabs -->
+    <div data-tab-group="adminTab">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="manageBooking" onclick="switchTab('adminTab', 'manageBooking')">&#128197; จัดการการจอง</button>
+        <button class="tab-btn" data-tab="checkFiles" onclick="switchTab('adminTab', 'checkFiles')">&#128194; ตรวจผลงาน</button>
+        <button class="tab-btn" data-tab="manageEval" onclick="switchTab('adminTab', 'manageEval')">&#11088; จัดการประเมิน</button>
+        <button class="tab-btn" data-tab="printReport" onclick="switchTab('adminTab', 'printReport')">&#128424; พิมพ์รายงาน</button>
+      </div>
+    </div>
+
+    <!-- Manage Bookings Tab -->
+    <div class="tab-content active" data-tab-content="manageBooking">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#128197; รายการจองทั้งหมด</h3>
+          <div style="display:flex;gap:8px;">
+            <select class="form-control" style="width:auto;" id="adminFilterStatus" onchange="loadAdminBookings()">
+              <option value="">ทุกสถานะ</option>
+              <option value="รอดำเนินการ">รอดำเนินการ</option>
+              <option value="ยืนยันแล้ว">ยืนยันแล้ว</option>
+              <option value="นิเทศแล้ว">นิเทศแล้ว</option>
+              <option value="ปฏิเสธ">ปฏิเสธ</option>
+            </select>
+            <button class="btn btn-sm btn-outline" onclick="loadAdminBookings()">&#128260; รีเฟรช</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ชื่อครู</th>
+                  <th>กลุ่มสาระ</th>
+                  <th>วิชา</th>
+                  <th>สถานะ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="adminBookingsTable">
+                <tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Check Files Tab -->
+    <div class="tab-content" data-tab-content="checkFiles">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#128194; ไฟล์รอตรวจสอบ</h3>
+          <div style="display:flex;gap:8px;">
+            <select class="form-control" style="width:auto;" id="adminFilterFileStatus" onchange="loadAdminFiles()">
+              <option value="">ทุกสถานะ</option>
+              <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+              <option value="ผ่าน">ผ่าน</option>
+              <option value="ปรับปรุง">ขอแก้ไข</option>
+            </select>
+            <button class="btn btn-sm btn-outline" onclick="loadAdminFiles()">&#128260; รีเฟรช</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>วันที่ส่ง</th>
+                  <th>ชื่อครู</th>
+                  <th>ประเภท</th>
+                  <th>ชื่อไฟล์</th>
+                  <th>สถานะ</th>
+                  <th>ลิงก์</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="adminFilesTable">
+                <tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Evaluations Tab -->
+    <div class="tab-content" data-tab-content="manageEval">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#11088; ผลการประเมินทั้งหมด</h3>
+          <button class="btn btn-sm btn-outline" onclick="loadAdminEvaluations()">&#128260; รีเฟรช</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>วันที่ประเมิน</th>
+                  <th>ชื่อครู</th>
+                  <th>วันที่นิเทศ</th>
+                  <th>จุดเด่น</th>
+                  <th>ระดับคุณภาพ</th>
+                  <th>ประเมินโดย</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="adminEvalTable">
+                <tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print Report Tab -->
+    <div class="tab-content" data-tab-content="printReport">
+      <div class="grid-2">
+        <!-- Individual Report -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128196; รายงานรายบุคคล</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>เลือกครู</label>
+              <select class="form-control" id="reportTeacher">
+                <option value="">-- เลือกครู --</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="printIndividualReport()">&#128424; พิมพ์รายงานรายบุคคล</button>
+          </div>
+        </div>
+
+        <!-- Department Report -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#127979; รายงานกลุ่มสาระ</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>เลือกกลุ่มสาระ</label>
+              <select class="form-control" id="reportDept">
+                <option value="">-- เลือกกลุ่มสาระ --</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="printDeptReport()">&#128424; พิมพ์รายงานกลุ่มสาระ</button>
+          </div>
+        </div>
+
+        <!-- General Report -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128202; รายงานสรุปภาพรวม</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label>วันที่เริ่มต้น</label>
+                <input type="date" class="form-control" id="reportStartDate">
+              </div>
+              <div class="form-group">
+                <label>วันที่สิ้นสุด</label>
+                <input type="date" class="form-control" id="reportEndDate">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="printGeneralReport()">&#128424; พิมพ์รายงานสรุป</button>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128200; สถิติด่วน</h3>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;gap:8px;">
+              <button class="btn btn-outline" onclick="showQuickStats('bookings')">&#128197; สถิติการจอง</button>
+              <button class="btn btn-outline" onclick="showQuickStats('files')">&#128194; สถิติไฟล์งาน</button>
+              <button class="btn btn-outline" onclick="showQuickStats('evaluations')">&#11088; สถิติการประเมิน</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review File Modal -->
+  <div class="modal-overlay" id="reviewFileModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>&#128196; ตรวจสอบไฟล์</h3>
+        <button class="modal-close" onclick="closeModal('reviewFileModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="reviewFileInfo"></div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>หมายเหตุ</label>
+          <textarea class="form-control" id="reviewNote" rows="3" placeholder="ใส่หมายเหตุ..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="reviewFile('ปรับปรุง')">&#128260; ขอแก้ไข</button>
+        <button class="btn btn-success" onclick="reviewFile('ผ่าน')">&#9989; อนุมัติ</button>
+        <button class="btn btn-outline" onclick="closeModal('reviewFileModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Booking Modal -->
+  <div class="modal-overlay" id="editBookingModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>&#9998; แก้ไขการจอง</h3>
+        <button class="modal-close" onclick="closeModal('editBookingModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editBookingRow">
+        <div class="form-row">
+          <div class="form-group">
+            <label>สถานะ</label>
+            <select class="form-control" id="editBookingStatus">
+              <option value="รอดำเนินการ">รอดำเนินการ</option>
+              <option value="ยืนยันแล้ว">ยืนยันแล้ว</option>
+              <option value="นิเทศแล้ว">นิเทศแล้ว</option>
+              <option value="ปฏิเสธ">ปฏิเสธ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>วันที่</label>
+            <input type="date" class="form-control" id="editBookingDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>หมายเหตุ</label>
+          <textarea class="form-control" id="editBookingNotes" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveBookingEdit()">&#128190; บันทึก</button>
+        <button class="btn btn-outline" onclick="closeModal('editBookingModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    if (!checkAuth()) { window.location.href = '../index.html'; }
+    var currentReviewFile = null;
+    var DEPARTMENTS = ['คณิตศาสตร์','วิทยาศาสตร์','ภาษาไทย','ภาษาอังกฤษ','สังคมศึกษา','พลศึกษา','ศิลปะ','การงานอาชีพ','เทคโนโลยี'];
+
+    function initAdmin() {
+      var ds = document.getElementById('reportDept');
+      DEPARTMENTS.forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;ds.appendChild(o);});
+      apiPost('getTeachers',{}).then(function(r){if(r.success&&r.teachers){var s=document.getElementById('reportTeacher');r.teachers.forEach(function(t){var o=document.createElement('option');o.value=t;o.textContent=t;s.appendChild(o);});}}).catch(function(e){console.error(e);});
+    }
+
+    function loadAdminBookings() {
+      var st=document.getElementById('adminFilterStatus').value;
+      var d=st?{status:st}:{};
+      apiPost('getBookings',d).then(function(result){
+        var tbody=document.getElementById('adminBookingsTable');
+        if(result.success&&result.bookings.length>0){
+          tbody.innerHTML=result.bookings.map(function(b,i){
+            var acts='';
+            if(b['Status']==='รอดำเนินการ'){acts='<button class="btn btn-sm btn-success" onclick="confirmBooking('+b.rowNumber+')">&#9989;</button> <button class="btn btn-sm btn-danger" onclick="rejectBooking('+b.rowNumber+')">&#10007;</button> ';}
+            acts+='<button class="btn btn-sm btn-warning" onclick="openEditBooking('+b.rowNumber+')">&#9998;</button> <button class="btn btn-sm btn-danger" onclick="deleteBookingConfirm('+b.rowNumber+')">&#128465;</button>';
+            return '<tr><td>'+(i+1)+'</td><td>'+formatDate(b['Date'])+'</td><td>'+escapeHtml(b['Time'])+'</td><td>'+escapeHtml(b['Teacher Name'])+'</td><td>'+escapeHtml(b['Department'])+'</td><td>'+escapeHtml(b['Subject Name'])+'</td><td>'+getStatusBadge(b['Status'])+'</td><td><div class="btn-group">'+acts+'</div></td></tr>';
+          }).join('');
+        } else { tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#128197;</div><h4>ไม่มีรายการจอง</h4></div></td></tr>'; }
+      }).catch(function(e){console.error(e);});
+    }
+
+    function confirmBooking(rn){if(!confirm('ยืนยันการจองนี้?'))return;apiPost('updateBooking',{rowNumber:rn,status:'ยืนยันแล้ว'}).then(function(r){if(r.success){showToast('ยืนยันสำเร็จ','success');loadAdminBookings();}else showToast(r.message,'error');});}
+    function rejectBooking(rn){if(!confirm('ปฏิเสธการจองนี้?'))return;apiPost('updateBooking',{rowNumber:rn,status:'ปฏิเสธ'}).then(function(r){if(r.success){showToast('ปฏิเสธแล้ว','warning');loadAdminBookings();}else showToast(r.message,'error');});}
+    function deleteBookingConfirm(rn){if(!confirm('ต้องการลบการจองนี้?'))return;apiPost('deleteBooking',{rowNumber:rn}).then(function(r){if(r.success){showToast('ลบสำเร็จ','success');loadAdminBookings();}else showToast(r.message,'error');});}
+    function openEditBooking(rn){document.getElementById('editBookingRow').value=rn;openModal('editBookingModal');}
+    function saveBookingEdit(){var rn=parseInt(document.getElementById('editBookingRow').value);apiPost('updateBooking',{rowNumber:rn,status:document.getElementById('editBookingStatus').value,date:document.getElementById('editBookingDate').value,notes:document.getElementById('editBookingNotes').value}).then(function(r){if(r.success){showToast('บันทึกสำเร็จ','success');closeModal('editBookingModal');loadAdminBookings();}else showToast(r.message,'error');});}
+
+    function loadAdminFiles() {
+      var st=document.getElementById('adminFilterFileStatus').value;
+      var d=st?{status:st}:{};
+      apiPost('getFiles',d).then(function(result){
+        var tbody=document.getElementById('adminFilesTable');
+        if(result.success&&result.files.length>0){
+          tbody.innerHTML=result.files.map(function(f,i){
+            return '<tr><td>'+(i+1)+'</td><td>'+formatDateTime(f['Timestamp'])+'</td><td>'+escapeHtml(f['Teacher Name'])+'</td><td>'+getFileTypeIcon(f['File Type'])+' '+escapeHtml(f['File Type'])+'</td><td>'+escapeHtml(f['File Name'])+'</td><td>'+getStatusBadge(f['Status'])+'</td><td>'+(f['File URL']?'<a href="'+f['File URL']+'" target="_blank" class="btn btn-sm btn-info">&#128279;</a>':'-')+'</td><td><div class="btn-group"><button class="btn btn-sm btn-success" onclick="openReviewFile('+f.rowNumber+')">&#9989;</button> <button class="btn btn-sm btn-danger" onclick="deleteFileConfirm('+f.rowNumber+')">&#128465;</button></div></td></tr>';
+          }).join('');
+        } else { tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#128194;</div><h4>ไม่มีไฟล์งาน</h4></div></td></tr>'; }
+      }).catch(function(e){console.error(e);});
+    }
+
+    function openReviewFile(rn){currentReviewFile=rn;document.getElementById('reviewNote').value='';openModal('reviewFileModal');}
+    function reviewFile(status){if(!currentReviewFile)return;apiPost('updateFileStatus',{rowNumber:currentReviewFile,status:status,adminNote:document.getElementById('reviewNote').value,reviewedBy:APP.user.fullName}).then(function(r){if(r.success){showToast(status==='ผ่าน'?'อนุมัติสำเร็จ':'ขอแก้ไขแล้ว','success');closeModal('reviewFileModal');loadAdminFiles();}else showToast(r.message,'error');});}
+    function deleteFileConfirm(rn){if(!confirm('ต้องการลบไฟล์นี้?'))return;apiPost('deleteFile',{rowNumber:rn}).then(function(r){if(r.success){showToast('ลบสำเร็จ','success');loadAdminFiles();}else showToast(r.message,'error');});}
+
+    function loadAdminEvaluations() {
+      apiPost('getEvaluations',{}).then(function(result){
+        var tbody=document.getElementById('adminEvalTable');
+        if(result.success&&result.evaluations.length>0){
+          tbody.innerHTML=result.evaluations.map(function(e,i){
+            return '<tr><td>'+(i+1)+'</td><td>'+formatDateTime(e['Timestamp'])+'</td><td>'+escapeHtml(e['Teacher Name'])+'</td><td>'+formatDate(e['Supervision Date'])+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escapeHtml(e['Strengths'])+'">'+escapeHtml(e['Strengths'])+'</td><td>'+getStatusBadge(e['Quality Level'])+'</td><td>'+escapeHtml(e['Evaluated By']||'-')+'</td><td><button class="btn btn-sm btn-danger" onclick="deleteEvalConfirm('+e.rowNumber+')">&#128465;</button></td></tr>';
+          }).join('');
+        } else { tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#11088;</div><h4>ไม่มีผลประเมิน</h4></div></td></tr>'; }
+      }).catch(function(e){console.error(e);});
+    }
+
+    function deleteEvalConfirm(rn){if(!confirm('ต้องการลบผลประเมินนี้?'))return;apiPost('deleteEvaluation',{rowNumber:rn}).then(function(r){if(r.success){showToast('ลบสำเร็จ','success');loadAdminEvaluations();}else showToast(r.message,'error');});}
+
+    function printIndividualReport(){var t=document.getElementById('reportTeacher').value;if(!t){showToast('กรุณาเลือกครู','error');return;}apiPost('getTeacherReport',{teacherName:t}).then(function(r){if(!r.success)return;var rp=r.report;var c='<p><strong>ครู:</strong> '+escapeHtml(t)+'</p><p>จอง: '+rp.summary.totalBookings+' นิเทศแล้ว: '+rp.summary.completedBookings+' ไฟล์: '+rp.summary.totalFiles+' ประเมิน: '+rp.summary.totalEvaluations+'</p><h3 style="color:#1a5276;">ประวัติการนิเทศ</h3><table><thead><tr><th>วันที่</th><th>วิชา</th><th>สถานะ</th></tr></thead><tbody>';rp.bookings.forEach(function(b){c+='<tr><td>'+formatDate(b.date)+'</td><td>'+escapeHtml(b.subjectName)+'</td><td>'+getStatusBadge(b.status)+'</td></tr>';});c+='</tbody></table>';printReport('รายงานรายบุคคล - '+escapeHtml(t),c);});}
+
+    function printDeptReport(){var d=document.getElementById('reportDept').value;if(!d){showToast('กรุณาเลือกกลุ่มสาระ','error');return;}apiPost('getDepartmentReport',{department:d}).then(function(r){if(!r.success)return;var rp=r.report;var c='<p><strong>กลุ่มสาระ:</strong> '+escapeHtml(d)+'</p><p>ครู: '+rp.summary.totalTeachers+' คน</p><table><thead><tr><th>ชื่อครู</th><th>การจอง</th><th>นิเทศแล้ว</th></tr></thead><tbody>';Object.entries(rp.teachers).forEach(function(e){c+='<tr><td>'+escapeHtml(e[0])+'</td><td>'+e[1].totalBookings+'</td><td>'+e[1].completedBookings+'</td></tr>';});c+='</tbody></table>';printReport('รายงานกลุ่มสาระ - '+escapeHtml(d),c);});}
+
+    function printGeneralReport(){var sd=document.getElementById('reportStartDate').value;var ed=document.getElementById('reportEndDate').value;apiPost('getReport',{startDate:sd,endDate:ed}).then(function(r){if(!r.success)return;var rp=r.report;var c='<p>ช่วง: '+(sd?formatDate(sd):'ทั้งหมด')+' - '+(ed?formatDate(ed):'ทั้งหมด')+'</p><table><thead><tr><th>วันที่</th><th>ครู</th><th>วิชา</th><th>สถานะ</th></tr></thead><tbody>';rp.bookings.forEach(function(b){c+='<tr><td>'+formatDate(b.date)+'</td><td>'+escapeHtml(b.teacherName)+'</td><td>'+escapeHtml(b.subjectName)+'</td><td>'+getStatusBadge(b.status)+'</td></tr>';});c+='</tbody></table>';printReport('รายงานสรุปภาพรวม',c);});}
+
+    function showQuickStats(type){apiPost('getDashboardStats',{}).then(function(r){if(!r.success)return;var s=r.stats;var c='';if(type==='bookings'){c='<h3>สถิติการจอง</h3><table><thead><tr><th>สถานะ</th><th>จำนวน</th></tr></thead><tbody><tr><td>รอดำเนินการ</td><td>'+s.pendingBookings+'</td></tr><tr><td>ยืนยันแล้ว</td><td>'+s.confirmedBookings+'</td></tr><tr><td>นิเทศแล้ว</td><td>'+s.completedBookings+'</td></tr><tr><td>ปฏิเสธ</td><td>'+s.rejectedBookings+'</td></tr><tr><td><strong>รวม</strong></td><td><strong>'+s.totalBookings+'</strong></td></tr></tbody></table>';}else if(type==='files'){c='<h3>สถิติไฟล์งาน</h3><table><thead><tr><th>สถานะ</th><th>จำนวน</th></tr></thead><tbody><tr><td>รอตรวจสอบ</td><td>'+s.pendingFiles+'</td></tr><tr><td>ผ่าน</td><td>'+s.approvedFiles+'</td></tr><tr><td>ขอแก้ไข</td><td>'+s.reviseFiles+'</td></tr><tr><td><strong>รวม</strong></td><td><strong>'+s.totalFiles+'</strong></td></tr></tbody></table>';}else if(type==='evaluations'){c='<h3>สถิติการประเมิน</h3><table><thead><tr><th>ระดับ</th><th>จำนวน</th></tr></thead><tbody><tr><td>ดีมาก</td><td>'+s.excellentCount+'</td></tr><tr><td>ดี</td><td>'+s.goodCount+'</td></tr><tr><td>พอใช้</td><td>'+s.fairCount+'</td></tr><tr><td>ปรับปรุง</td><td>'+s.poorCount+'</td></tr><tr><td><strong>รวม</strong></td><td><strong>'+s.totalEvaluations+'</strong></td></tr></tbody></table>';}printReport('สถิติด่วน',c);});}
+
+    updateUserUI();initAdmin();loadAdminBookings();loadAdminFiles();loadAdminEvaluations();
+  </script>
+    }
+
+    let currentReviewFile = null;
+
+    const DEPARTMENTS = [
+      'คณิตศาสตร์', 'วิทยาศาสตร์', 'ภาษาไทย', 'ภาษาอังกฤษ',
+      'สังคมศึกษา', 'พลศึกษา', 'ศิลปะ', 'การงานอาชีพ', 'เทคโนโลยี'
+    ];
+
+    function initAdmin() {
+      const deptSelect = document.getElementById('reportDept');
+      DEPARTMENTS.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        deptSelect.appendChild(opt);
+      });
+
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success && result.teachers) {
+            const teacherSelect = document.getElementById('reportTeacher');
+            result.teachers.forEach(t => {
+              const opt = document.createElement('option');
+              opt.value = t;
+              opt.textContent = t;
+              teacherSelect.appendChild(opt);
+            });
+          }
+        })
+        .getTeachers();
+    }
+
+    // ============================================
+    // Bookings Management
+    // ============================================
+
+    function loadAdminBookings() {
+      const status = document.getElementById('adminFilterStatus').value;
+      const data = status ? { status } : {};
+
+      apiPost
+        .withSuccessHandler(result => {
+          const tbody = document.getElementById('adminBookingsTable');
+          if (result.success && result.bookings.length > 0) {
+            tbody.innerHTML = result.bookings.map((b, idx) => `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${formatDate(b['Date'])}</td>
+                <td>${escapeHtml(b['Time'])}</td>
+                <td>${escapeHtml(b['Teacher Name'])}</td>
+                <td>${escapeHtml(b['Department'])}</td>
+                <td>${escapeHtml(b['Subject Name'])}</td>
+                <td>${getStatusBadge(b['Status'])}</td>
+                <td>
+                  <div class="btn-group">
+                    ${b['Status'] === 'รอดำเนินการ' ? `
+                      <button class="btn btn-sm btn-success" onclick="confirmBooking(${b.rowNumber})">&#9989;</button>
+                      <button class="btn btn-sm btn-danger" onclick="rejectBooking(${b.rowNumber})">&#10007;</button>
+                    ` : ''}
+                    <button class="btn btn-sm btn-warning" onclick="openEditBooking(${b.rowNumber}, '${escapeHtml(b['Status'])}', '${b['Date']}', '${escapeHtml(b['Notes'] || '')}')">&#9998;</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteBookingConfirm(${b.rowNumber})">&#128465;</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">&#128197;</div><h4>ไม่มีรายการจอง</h4></div></td></tr>';
+          }
+        })
+        .getBookings(data);
+    }
+
+    function confirmBooking(rowNumber) {
+      if (!confirm('ยืนยันการจองนี้?')) return;
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast('ยืนยันการจองสำเร็จ', 'success');
+            loadAdminBookings();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .updateBooking({ rowNumber, status: 'ยืนยันแล้ว' });
+    }
+
+    function rejectBooking(rowNumber) {
+      if (!confirm('ปฏิเสธการจองนี้?')) return;
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast('ปฏิเสธการจองแล้ว', 'warning');
+            loadAdminBookings();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .updateBooking({ rowNumber, status: 'ปฏิเสธ' });
+    }
+
+    function deleteBookingConfirm(rowNumber) {
+      if (!confirm('ต้องการลบการจองนี้? การกระทำนี้ไม่สามารถย้อนกลับได้')) return;
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast('ลบการจองสำเร็จ', 'success');
+            loadAdminBookings();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .deleteBooking({ rowNumber });
+    }
+
+    function openEditBooking(rowNumber, status, date, notes) {
+      document.getElementById('editBookingRow').value = rowNumber;
+      document.getElementById('editBookingStatus').value = status;
+      document.getElementById('editBookingDate').value = date;
+      document.getElementById('editBookingNotes').value = notes;
+      openModal('editBookingModal');
+    }
+
+    function saveBookingEdit() {
+      const rowNumber = parseInt(document.getElementById('editBookingRow').value);
+      const data = {
+        rowNumber: rowNumber,
+        status: document.getElementById('editBookingStatus').value,
+        date: document.getElementById('editBookingDate').value,
+        notes: document.getElementById('editBookingNotes').value
+      };
+
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast('บันทึกสำเร็จ', 'success');
+            closeModal('editBookingModal');
+            loadAdminBookings();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .updateBooking(data);
+    }
+
+    // ============================================
+    // Files Management
+    // ============================================
+
+    function loadAdminFiles() {
+      const status = document.getElementById('adminFilterFileStatus').value;
+      const data = status ? { status } : {};
+
+      apiPost
+        .withSuccessHandler(result => {
+          const tbody = document.getElementById('adminFilesTable');
+          if (result.success && result.files.length > 0) {
+            tbody.innerHTML = result.files.map((f, idx) => `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${formatDateTime(f['Timestamp'])}</td>
+                <td>${escapeHtml(f['Teacher Name'])}</td>
+                <td>${getFileTypeIcon(f['File Type'])} ${escapeHtml(f['File Type'])}</td>
+                <td>${escapeHtml(f['File Name'])}</td>
+                <td>${getStatusBadge(f['Status'])}</td>
+                <td>${f['File URL'] ? `<a href="${f['File URL']}" target="_blank" class="btn btn-sm btn-info">&#128279;</a>` : '-'}</td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-success" onclick="openReviewFile(${f.rowNumber}, '${escapeHtml(f['Teacher Name'])}', '${escapeHtml(f['File Type'])}', '${escapeHtml(f['File Name'])}', '${f['File URL'] || ''}')">&#9989; ตรวจ</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteFileConfirm(${f.rowNumber}, '${f['Drive File ID'] || ''}')">&#128465;</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">&#128194;</div><h4>ไม่มีไฟล์งาน</h4></div></td></tr>';
+          }
+        })
+        .getFiles(data);
+    }
+
+    function openReviewFile(rowNumber, teacher, type, name, url) {
+      currentReviewFile = rowNumber;
+      document.getElementById('reviewFileInfo').innerHTML = `
+        <div style="display:grid;gap:8px;">
+          <div><strong>ครู:</strong> ${teacher}</div>
+          <div><strong>ประเภท:</strong> ${type}</div>
+          <div><strong>ชื่อไฟล์:</strong> ${name}</div>
+          ${url ? `<div><strong>ลิงก์:</strong> <a href="${url}" target="_blank">เปิดไฟล์</a></div>` : ''}
+        </div>
+      `;
+      document.getElementById('reviewNote').value = '';
+      openModal('reviewFileModal');
+    }
+
+    function reviewFile(status) {
+      if (!currentReviewFile) return;
+      const note = document.getElementById('reviewNote').value;
+
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast(status === 'ผ่าน' ? 'อนุมัติไฟล์สำเร็จ' : 'ขอแก้ไขไฟล์แล้ว', 'success');
+            closeModal('reviewFileModal');
+            loadAdminFiles();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .updateFileStatus({
+          rowNumber: currentReviewFile,
+          status: status,
+          adminNote: note,
+          reviewedBy: APP.user.fullName
+        });
+    }
+
+    function deleteFileConfirm(rowNumber, driveFileId) {
+      if (!confirm('ต้องการลบไฟล์นี้?')) return;
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast('ลบไฟล์สำเร็จ', 'success');
+            loadAdminFiles();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .deleteFile({ rowNumber, driveFileId });
+    }
+
+    // ============================================
+    // Evaluations Management
+    // ============================================
+
+    function loadAdminEvaluations() {
+      apiPost
+        .withSuccessHandler(result => {
+          const tbody = document.getElementById('adminEvalTable');
+          if (result.success && result.evaluations.length > 0) {
+            tbody.innerHTML = result.evaluations.map((e, idx) => `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${formatDateTime(e['Timestamp'])}</td>
+                <td>${escapeHtml(e['Teacher Name'])}</td>
+                <td>${formatDate(e['Supervision Date'])}</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(e['Strengths'])}">${escapeHtml(e['Strengths'])}</td>
+                <td>${getStatusBadge(e['Quality Level'])}</td>
+                <td>${escapeHtml(e['Evaluated By'] || '-')}</td>
+                <td>
+                  <button class="btn btn-sm btn-danger" onclick="deleteEvalConfirm(${e.rowNumber})">&#128465;</button>
+                </td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">&#11088;</div><h4>ไม่มีผลประเมิน</h4></div></td></tr>';
+          }
+        })
+        .getEvaluations({});
+    }
+
+    function deleteEvalConfirm(rowNumber) {
+      if (!confirm('ต้องการลบผลการประเมินนี้?')) return;
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            showToast('ลบผลการประเมินสำเร็จ', 'success');
+            loadAdminEvaluations();
+          } else {
+            showToast(result.message, 'error');
+          }
+        })
+        .deleteEvaluation({ rowNumber });
+    }
+
+    // ============================================
+    // Reports
+    // ============================================
+
+    function printIndividualReport() {
+      const teacher = document.getElementById('reportTeacher').value;
+      if (!teacher) {
+        showToast('กรุณาเลือกครู', 'error');
+        return;
+      }
+
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            const r = result.report;
+            let content = `
+              <p><strong>ครู:</strong> ${escapeHtml(teacher)}</p>
+              <p><strong>จำนวนการจอง:</strong> ${r.summary.totalBookings} ครั้ง | <strong>นิเทศแล้ว:</strong> ${r.summary.completedBookings} ครั้ง</p>
+              <p><strong>ไฟล์งาน:</strong> ${r.summary.totalFiles} ไฟล์ | <strong>ผ่าน:</strong> ${r.summary.approvedFiles} ไฟล์</p>
+              <p><strong>ผลประเมิน:</strong> ${r.summary.totalEvaluations} ครั้ง | <strong>ระดับเฉลี่ย:</strong> ${r.summary.avgQuality}</p>
+              <h3 style="margin-top:20px;color:#1a5276;">ประวัติการนิเทศ</h3>
+              <table>
+                <thead><tr><th>วันที่</th><th>วิชา</th><th>สถานะ</th></tr></thead>
+                <tbody>
+            `;
+            r.bookings.forEach(b => {
+              content += `<tr><td>${formatDate(b.date)}</td><td>${escapeHtml(b.subjectName)}</td><td>${getStatusBadge(b.status)}</td></tr>`;
+            });
+            content += '</tbody></table>';
+
+            if (r.evaluations.length > 0) {
+              content += '<h3 style="margin-top:20px;color:#1a5276;">ผลการประเมิน</h3><table><thead><tr><th>วันที่</th><th>จุดเด่น</th><th>จุดพัฒนา</th><th>ระดับ</th></tr></thead><tbody>';
+              r.evaluations.forEach(e => {
+                content += `<tr><td>${formatDate(e.supervisionDate)}</td><td>${escapeHtml(e.strengths)}</td><td>${escapeHtml(e.improvements)}</td><td>${getStatusBadge(e.qualityLevel)}</td></tr>`;
+              });
+              content += '</tbody></table>';
+            }
+
+            printReport('รายงานรายบุคคล - ' + escapeHtml(teacher), content);
+          }
+        })
+        .getTeacherReport({ teacherName: teacher });
+    }
+
+    function printDeptReport() {
+      const dept = document.getElementById('reportDept').value;
+      if (!dept) {
+        showToast('กรุณาเลือกกลุ่มสาระ', 'error');
+        return;
+      }
+
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            const r = result.report;
+            let content = `
+              <p><strong>กลุ่มสาระ:</strong> ${escapeHtml(dept)}</p>
+              <p><strong>จำนวนครู:</strong> ${r.summary.totalTeachers} คน | <strong>การจองทั้งหมด:</strong> ${r.summary.totalBookings} ครั้ง</p>
+              <h3 style="margin-top:20px;color:#1a5276;">รายงานรายครู</h3>
+              <table>
+                <thead><tr><th>ชื่อครู</th><th>การจอง</th><th>นิเทศแล้ว</th><th>ผลประเมิน</th></tr></thead>
+                <tbody>
+            `;
+            Object.entries(r.teachers).forEach(([name, data]) => {
+              const evalSummary = data.evaluations.length > 0
+                ? data.evaluations.map(e => getStatusBadge(e.qualityLevel)).join(' ')
+                : '-';
+              content += `<tr><td>${escapeHtml(name)}</td><td>${data.totalBookings}</td><td>${data.completedBookings}</td><td>${evalSummary}</td></tr>`;
+            });
+            content += '</tbody></table>';
+
+            printReport('รายงานกลุ่มสาระ - ' + escapeHtml(dept), content);
+          }
+        })
+        .getDepartmentReport({ department: dept });
+    }
+
+    function printGeneralReport() {
+      const startDate = document.getElementById('reportStartDate').value;
+      const endDate = document.getElementById('reportEndDate').value;
+
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            const r = result.report;
+            let content = `
+              <p><strong>ช่วงวันที่:</strong> ${startDate ? formatDate(startDate) : 'ทั้งหมด'} - ${endDate ? formatDate(endDate) : 'ทั้งหมด'}</p>
+              <div class="stats-grid" style="margin:16px 0;">
+                <div style="padding:12px;background:#e8f4fd;border-radius:8px;text-align:center;">
+                  <div style="font-size:24px;font-weight:700;">${r.summary.totalBookings}</div>
+                  <div style="font-size:12px;">การจองทั้งหมด</div>
+                </div>
+                <div style="padding:12px;background:#d4edda;border-radius:8px;text-align:center;">
+                  <div style="font-size:24px;font-weight:700;">${r.summary.completedBookings}</div>
+                  <div style="font-size:12px;">นิเทศแล้ว</div>
+                </div>
+                <div style="padding:12px;background:#fef5e7;border-radius:8px;text-align:center;">
+                  <div style="font-size:24px;font-weight:700;">${r.summary.totalFiles}</div>
+                  <div style="font-size:12px;">ไฟล์งาน</div>
+                </div>
+                <div style="padding:12px;background:#f0e8fd;border-radius:8px;text-align:center;">
+                  <div style="font-size:24px;font-weight:700;">${r.summary.totalEvaluations}</div>
+                  <div style="font-size:12px;">ผลประเมิน</div>
+                </div>
+              </div>
+              <h3 style="margin-top:20px;color:#1a5276;">รายการจอง</h3>
+              <table>
+                <thead><tr><th>วันที่</th><th>ครู</th><th>วิชา</th><th>กลุ่มสาระ</th><th>สถานะ</th></tr></thead>
+                <tbody>
+            `;
+            r.bookings.forEach(b => {
+              content += `<tr><td>${formatDate(b.date)}</td><td>${escapeHtml(b.teacherName)}</td><td>${escapeHtml(b.subjectName)}</td><td>${escapeHtml(b.department)}</td><td>${getStatusBadge(b.status)}</td></tr>`;
+            });
+            content += '</tbody></table>';
+
+            printReport('รายงานสรุปภาพรวมระบบการนิเทศ', content);
+          }
+        })
+        .getReport({ startDate, endDate });
+    }
+
+    function showQuickStats(type) {
+      apiPost
+        .withSuccessHandler(result => {
+          if (result.success) {
+            const s = result.stats;
+            let content = '';
+
+            if (type === 'bookings') {
+              content = `
+                <h3 style="color:#1a5276;">สถิติการจอง</h3>
+                <table>
+                  <thead><tr><th>สถานะ</th><th>จำนวน</th></tr></thead>
+                  <tbody>
+                    <tr><td>รอดำเนินการ</td><td>${s.pendingBookings}</td></tr>
+                    <tr><td>ยืนยันแล้ว</td><td>${s.confirmedBookings}</td></tr>
+                    <tr><td>นิเทศแล้ว</td><td>${s.completedBookings}</td></tr>
+                    <tr><td>ปฏิเสธ</td><td>${s.rejectedBookings}</td></tr>
+                    <tr><td><strong>รวม</strong></td><td><strong>${s.totalBookings}</strong></td></tr>
+                  </tbody>
+                </table>
+              `;
+            } else if (type === 'files') {
+              content = `
+                <h3 style="color:#1a5276;">สถิติไฟล์งาน</h3>
+                <table>
+                  <thead><tr><th>สถานะ</th><th>จำนวน</th></tr></thead>
+                  <tbody>
+                    <tr><td>รอตรวจสอบ</td><td>${s.pendingFiles}</td></tr>
+                    <tr><td>ผ่าน</td><td>${s.approvedFiles}</td></tr>
+                    <tr><td>ขอแก้ไข</td><td>${s.reviseFiles}</td></tr>
+                    <tr><td><strong>รวม</strong></td><td><strong>${s.totalFiles}</strong></td></tr>
+                  </tbody>
+                </table>
+              `;
+            } else if (type === 'evaluations') {
+              content = `
+                <h3 style="color:#1a5276;">สถิติการประเมิน</h3>
+                <table>
+                  <thead><tr><th>ระดับ</th><th>จำนวน</th></tr></thead>
+                  <tbody>
+                    <tr><td>ดีมาก</td><td>${s.excellentCount}</td></tr>
+                    <tr><td>ดี</td><td>${s.goodCount}</td></tr>
+                    <tr><td>พอใช้</td><td>${s.fairCount}</td></tr>
+                    <tr><td>ปรับปรุง</td><td>${s.poorCount}</td></tr>
+                    <tr><td><strong>รวม</strong></td><td><strong>${s.totalEvaluations}</strong></td></tr>
+                  </tbody>
+                </table>
+              `;
+            }
+
+            printReport('สถิติด่วน', content);
+          }
+        })
+        .getDashboardStats({});
+    }
+
+    // Init
+    updateUserUI();
+    initAdmin();
+    loadAdminBookings();
+    loadAdminFiles();
+    loadAdminEvaluations();
+  </script>
+</body>
+</html>
