@@ -148,6 +148,21 @@ body {
   border-color: var(--danger);
 }
 
+.btn-login {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: var(--transition);
+}
+
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 /* ============================================================
    Main Content
    ============================================================ */

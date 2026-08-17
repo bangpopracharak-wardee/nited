@@ -21,18 +21,19 @@
       </a>
       <ul class="navbar-nav">
         <li><a href="index.html" data-page="dashboard" class="active">&#127968; หน้าหลัก</a></li>
-        <li><a href="pages/booking.html" data-page="booking">&#128197; จองวันนิเทศ</a></li>
-        <li><a href="pages/files.html" data-page="files">&#128194; ส่งงาน</a></li>
-        <li><a href="pages/evaluation.html" data-page="evaluation">&#11088; ประเมินผล</a></li>
+        <li class="auth-only"><a href="pages/booking.html" data-page="booking">&#128197; จองวันนิเทศ</a></li>
+        <li class="auth-only"><a href="pages/files.html" data-page="files">&#128194; ส่งงาน</a></li>
+        <li class="auth-only"><a href="pages/evaluation.html" data-page="evaluation">&#11088; ประเมินผล</a></li>
         <li><a href="pages/reports.html" data-page="reports">&#128202; รายงาน</a></li>
         <li class="admin-only"><a href="pages/admin.html" data-page="admin">&#9881; ผู้ดูแลระบบ</a></li>
       </ul>
-      <div class="navbar-user">
-        <div>
+      <div class="navbar-user" id="navbarUserSection">
+        <div id="userInfoDiv" style="display:none;">
           <div class="user-name" id="userName">-</div>
           <div style="font-size:11px;opacity:0.7;" id="userRole">-</div>
         </div>
-        <button class="btn-logout" onclick="logout()">&#10140; ออกจากระบบ</button>
+        <button class="btn-login" id="btnLoginNav" onclick="openModal('loginModal')">&#128274; เข้าสู่ระบบ</button>
+        <button class="btn-logout" id="btnLogoutNav" style="display:none;" onclick="logout()">&#10140; ออกจากระบบ</button>
       </div>
     </div>
   </nav>
@@ -40,7 +41,7 @@
   <!-- Main Content -->
   <div class="main-content">
     <div class="page-header">
-      <h1>&#127968; แดชบอร์ด</h1>
+      <h1>&#128202; รายงานสถิติการนิเทศภายใน</h1>
       <p>ภาพรวมระบบบริหารจัดการการนิเทศภายในโรงเรียนนราศึกษาธิการ</p>
     </div>
 
@@ -83,11 +84,43 @@
       </div>
     </div>
 
-    <!-- Calendar + Recent -->
+    <!-- Charts -->
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-header">
+          <h3>&#128202; สถิติสถานะการจอง</h3>
+        </div>
+        <div class="card-body">
+          <div id="bookingStatusChart"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>&#11088; สถิติระดับคุณภาพ</h3>
+        </div>
+        <div class="card-body">
+          <div id="qualityChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Stats -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <h3>&#127979; สถิติกลุ่มสาระการเรียนรู้</h3>
+      </div>
+      <div class="card-body">
+        <div id="deptReportChart"></div>
+      </div>
+    </div>
+
     <div class="grid-2-1">
       <div>
         <!-- Calendar -->
         <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <h3>&#128197; ปฏิทินการนิเทศ</h3>
+          </div>
           <div class="card-body" style="padding:0;">
             <div id="dashboardCalendar"></div>
           </div>
@@ -97,7 +130,6 @@
         <div class="card">
           <div class="card-header">
             <h3>&#128197; การจองล่าสุด</h3>
-            <a href="pages/booking.html" class="btn btn-sm btn-outline">ดูทั้งหมด</a>
           </div>
           <div class="card-body" style="padding:0;">
             <div class="table-responsive">
@@ -120,13 +152,27 @@
       </div>
 
       <div>
-        <!-- Stats Summary -->
+        <!-- Teacher Stats -->
         <div class="card" style="margin-bottom:20px;">
           <div class="card-header">
-            <h3>&#128202; สถิติกลุ่มสาระ</h3>
+            <h3>&#128100; สถิติครูผู้สอน</h3>
           </div>
-          <div class="card-body">
-            <div id="deptStats"></div>
+          <div class="card-body" style="padding:0;">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ชื่อครู</th>
+                    <th>จอง</th>
+                    <th>นิเทศแล้ว</th>
+                    <th>ไฟล์</th>
+                  </tr>
+                </thead>
+                <tbody id="teacherStatsTable">
+                  <tr><td colspan="4" class="empty-state"><p>กำลังโหลด...</p></td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -134,7 +180,6 @@
         <div class="card" style="margin-bottom:20px;">
           <div class="card-header">
             <h3>&#128194; ไฟล์ล่าสุด</h3>
-            <a href="pages/files.html" class="btn btn-sm btn-outline">ดูทั้งหมด</a>
           </div>
           <div class="card-body" style="padding:0;">
             <div class="table-responsive">
@@ -172,77 +217,188 @@
     </div>
   </div>
 
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal" style="max-width:380px;">
+      <div class="modal-header">
+        <h3>&#128274; เข้าสู่ระบบ</h3>
+        <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="login-box">
+          <div class="form-group">
+            <label>ชื่อผู้ใช้</label>
+            <input type="text" class="form-control" id="loginUsername" placeholder="กรอกชื่อผู้ใช้">
+          </div>
+          <div class="form-group">
+            <label>รหัสผ่าน</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="กรอกรหัสผ่าน">
+          </div>
+          <div class="login-error" id="loginError" style="display:none;"></div>
+          <button class="btn btn-primary" style="width:100%;" onclick="handleIndexLogin()">เข้าสู่ระบบ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
   <script>
-    // Check authentication
-    if (!checkAuth()) {
-      window.location.href = 'index.html';
+    // Update navbar based on auth state
+    function updatePublicNavbar() {
+      var isLoggedIn = checkAuth();
+      var userInfoDiv = document.getElementById('userInfoDiv');
+      var btnLogin = document.getElementById('btnLoginNav');
+      var btnLogout = document.getElementById('btnLogoutNav');
+
+      if (isLoggedIn && APP.user) {
+        userInfoDiv.style.display = '';
+        document.getElementById('userName').textContent = APP.user.fullName;
+        document.getElementById('userRole').textContent = APP.user.role === 'admin' ? 'ผู้ดูแลระบบ' : APP.user.role;
+        btnLogin.style.display = 'none';
+        btnLogout.style.display = '';
+      } else {
+        userInfoDiv.style.display = 'none';
+        btnLogin.style.display = '';
+        btnLogout.style.display = 'none';
+      }
+
+      document.querySelectorAll('.admin-only').forEach(function(el) {
+        el.style.display = APP.user && APP.user.role === 'admin' ? '' : 'none';
+      });
+      document.querySelectorAll('.auth-only').forEach(function(el) {
+        el.style.display = isLoggedIn ? '' : 'none';
+      });
     }
 
-    // Load dashboard data
-    function loadDashboard() {
-      apiPost('getDashboardStats', {})
-        .then(result => {
+    function handleIndexLogin() {
+      var username = document.getElementById('loginUsername').value.trim();
+      var password = document.getElementById('loginPassword').value;
+      var errorEl = document.getElementById('loginError');
+      var btn = document.querySelector('.login-box .btn-primary');
+
+      if (!username || !password) {
+        errorEl.textContent = 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;"></span> กำลังเข้าสู่ระบบ...';
+
+      login(username, password)
+        .then(function(result) {
           if (result.success) {
-            const s = result.stats;
-            document.getElementById('statTotalBookings').textContent = s.totalBookings;
-            document.getElementById('statCompleted').textContent = s.completedBookings;
-            document.getElementById('statFiles').textContent = s.totalFiles;
-            document.getElementById('statEvaluations').textContent = s.totalEvaluations;
-            document.getElementById('statPending').textContent = s.pendingBookings + s.pendingFiles;
-
-            const bookingsTbody = document.getElementById('recentBookingsTable');
-            if (s.recentBookings && s.recentBookings.length > 0) {
-              bookingsTbody.innerHTML = s.recentBookings.map(b => `
-                <tr>
-                  <td>${formatDate(b.date)}</td>
-                  <td>${escapeHtml(b.teacherName)}</td>
-                  <td>${escapeHtml(b.subjectName)}</td>
-                  <td>${getStatusBadge(b.status)}</td>
-                </tr>
-              `).join('');
-            } else {
-              bookingsTbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="icon">&#128197;</div><h4>ยังไม่มีการจอง</h4></div></td></tr>';
-            }
-
-            const filesTbody = document.getElementById('recentFilesTable');
-            if (s.recentFiles && s.recentFiles.length > 0) {
-              filesTbody.innerHTML = s.recentFiles.map(f => `
-                <tr>
-                  <td>${escapeHtml(f.teacherName)}</td>
-                  <td>${escapeHtml(f.fileType)}</td>
-                  <td>${getStatusBadge(f.status)}</td>
-                </tr>
-              `).join('');
-            } else {
-              filesTbody.innerHTML = '<tr><td colspan="3"><div class="empty-state"><div class="icon">&#128194;</div><h4>ยังไม่มีไฟล์งาน</h4></div></td></tr>';
-            }
-
-            const deptEl = document.getElementById('deptStats');
-            if (s.departmentStats && Object.keys(s.departmentStats).length > 0) {
-              deptEl.innerHTML = Object.entries(s.departmentStats).map(([dept, data]) => `
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;">
-                  <span style="font-size:13px;font-weight:500;">${escapeHtml(dept)}</span>
-                  <div style="display:flex;gap:8px;font-size:12px;">
-                    <span style="color:#27ae60;">${data.completed}</span>/<span>${data.total}</span>
-                  </div>
-                </div>
-              `).join('');
-            } else {
-              deptEl.innerHTML = '<div class="empty-state"><p>ยังไม่มีข้อมูล</p></div>';
-            }
+            APP.user = result.user;
+            localStorage.setItem('nited_user', JSON.stringify(result.user));
+            closeModal('loginModal');
+            updatePublicNavbar();
+            showToast('เข้าสู่ระบบสำเร็จ');
+          } else {
+            errorEl.textContent = result.message;
+            errorEl.style.display = 'block';
           }
         })
-        .catch(err => console.error(err));
+        .catch(function(err) {
+          errorEl.textContent = 'เกิดข้อผิดพลาด: ' + (err.message || err);
+          errorEl.style.display = 'block';
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.innerHTML = 'เข้าสู่ระบบ';
+        });
     }
 
-    // Load calendar
-    calendarDate = new Date();
-    loadCalendarEvents('dashboardCalendar');
+    // Enter key to login
+    document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleIndexLogin();
+    });
+    document.getElementById('loginUsername').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleIndexLogin();
+    });
+
+    function makeBar(label, value, max, color) {
+      var pct = max > 0 ? (value / max) * 100 : 0;
+      return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">' +
+        '<div style="width:100px;font-size:13px;text-align:right;">' + label + '</div>' +
+        '<div style="flex:1;background:#f0f0f0;border-radius:4px;height:28px;overflow:hidden;">' +
+        '<div style="width:' + pct + '%;background:' + color + ';height:100%;display:flex;align-items:center;padding-left:8px;color:white;font-size:12px;font-weight:600;">' + value + '</div>' +
+        '</div></div>';
+    }
+
+    function loadDashboard() {
+      apiPost('getDashboardStats', {})
+        .then(function(result) {
+          if (!result.success) return;
+          var s = result.stats;
+          document.getElementById('statTotalBookings').textContent = s.totalBookings;
+          document.getElementById('statCompleted').textContent = s.completedBookings;
+          document.getElementById('statFiles').textContent = s.totalFiles;
+          document.getElementById('statEvaluations').textContent = s.totalEvaluations;
+          document.getElementById('statPending').textContent = s.pendingBookings + s.pendingFiles;
+
+          var maxB = Math.max(s.pendingBookings, s.confirmedBookings, s.completedBookings, s.rejectedBookings, 1);
+          document.getElementById('bookingStatusChart').innerHTML =
+            makeBar('รอดำเนินการ', s.pendingBookings, maxB, '#f39c12') +
+            makeBar('ยืนยันแล้ว', s.confirmedBookings, maxB, '#3498db') +
+            makeBar('นิเทศแล้ว', s.completedBookings, maxB, '#27ae60') +
+            makeBar('ปฏิเสธ', s.rejectedBookings, maxB, '#e74c3c');
+
+          var maxQ = Math.max(s.excellentCount, s.goodCount, s.fairCount, s.poorCount, 1);
+          document.getElementById('qualityChart').innerHTML =
+            makeBar('ดีมาก', s.excellentCount, maxQ, '#27ae60') +
+            makeBar('ดี', s.goodCount, maxQ, '#3498db') +
+            makeBar('พอใช้', s.fairCount, maxQ, '#f39c12') +
+            makeBar('ปรับปรุง', s.poorCount, maxQ, '#e74c3c');
+
+          var dept = s.departmentStats || {};
+          var deptKeys = Object.keys(dept);
+          var maxD = 1;
+          deptKeys.forEach(function(k) { if (dept[k].total > maxD) maxD = dept[k].total; });
+          if (deptKeys.length > 0) {
+            document.getElementById('deptReportChart').innerHTML = deptKeys.map(function(k) {
+              return makeBar(k, dept[k].total, maxD, '#1a5276');
+            }).join('');
+          } else {
+            document.getElementById('deptReportChart').innerHTML = '<div class="empty-state"><p>ยังไม่มีข้อมูล</p></div>';
+          }
+
+          var bookingsTbody = document.getElementById('recentBookingsTable');
+          if (s.recentBookings && s.recentBookings.length > 0) {
+            bookingsTbody.innerHTML = s.recentBookings.map(function(b) {
+              return '<tr><td>' + formatDate(b.date) + '</td><td>' + escapeHtml(b.teacherName) + '</td><td>' + escapeHtml(b.subjectName) + '</td><td>' + getStatusBadge(b.status) + '</td></tr>';
+            }).join('');
+          } else {
+            bookingsTbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="icon">&#128197;</div><h4>ยังไม่มีการจอง</h4></div></td></tr>';
+          }
+
+          var filesTbody = document.getElementById('recentFilesTable');
+          if (s.recentFiles && s.recentFiles.length > 0) {
+            filesTbody.innerHTML = s.recentFiles.map(function(f) {
+              return '<tr><td>' + escapeHtml(f.teacherName) + '</td><td>' + escapeHtml(f.fileType) + '</td><td>' + getStatusBadge(f.status) + '</td></tr>';
+            }).join('');
+          } else {
+            filesTbody.innerHTML = '<tr><td colspan="3"><div class="empty-state"><div class="icon">&#128194;</div><h4>ยังไม่มีไฟล์งาน</h4></div></td></tr>';
+          }
+
+          var teacherKeys = Object.keys(s.teacherStats || {});
+          var tbody = document.getElementById('teacherStatsTable');
+          if (teacherKeys.length > 0) {
+            tbody.innerHTML = teacherKeys.map(function(t) {
+              var ts = s.teacherStats[t];
+              return '<tr><td>' + escapeHtml(t) + '</td><td>' + ts.total + '</td><td>' + ts.completed + '</td><td>' + ts.files + '</td></tr>';
+            }).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><p>ยังไม่มีข้อมูล</p></div></td></tr>';
+          }
+        })
+        .catch(function(err) { console.error(err); });
+    }
 
     // Init
-    updateUserUI();
+    updatePublicNavbar();
+    calendarDate = new Date();
+    loadCalendarEvents('dashboardCalendar');
     loadDashboard();
   </script>
 </body>
