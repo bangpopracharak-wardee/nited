@@ -75,7 +75,8 @@ function handleLogin() {
       if (result.success) {
         APP.user = result.user;
         localStorage.setItem('nited_user', JSON.stringify(result.user));
-        window.location.href = 'index.html';
+        var root = window.location.pathname.indexOf('/pages/') >= 0 ? '../' : '';
+        window.location.href = root + 'index.html';
       } else {
         errorEl.textContent = result.message;
         errorEl.style.display = 'block';
@@ -94,7 +95,8 @@ function handleLogin() {
 function logout() {
   APP.user = null;
   localStorage.removeItem('nited_user');
-  window.location.href = 'index.html';
+  var root = window.location.pathname.indexOf('/pages/') >= 0 ? '../' : '';
+  window.location.href = root + 'index.html';
 }
 
 function updateUserUI() {
