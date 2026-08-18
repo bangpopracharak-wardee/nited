@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ผู้ดูแลระบบ - โรงเรียนนราศึกษาธิการ</title>
+  <title>ผู้ดูแลระบบ - โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์</title>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -15,7 +15,7 @@
         <div class="logo">&#127891;</div>
         <div>
           <div class="brand-text">ระบบนิเทศภายใน</div>
-          <div class="brand-sub">โรงเรียนนราศึกษาธิการ</div>
+          <div class="brand-sub">โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์</div>
         </div>
       </a>
       <ul class="navbar-nav">
@@ -283,7 +283,7 @@
             </div>
             <div class="form-group">
               <label>ชื่อโรงเรียน</label>
-              <input type="text" class="form-control" id="setSchoolName" placeholder="โรงเรียนนราศึกษาธิการ">
+              <input type="text" class="form-control" id="setSchoolName" placeholder="โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์">
             </div>
             <div class="form-group">
               <label>ที่อยู่ (แสดงใน Footer)</label>
@@ -320,7 +320,7 @@
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;" id="previewHeader">
                 <div id="previewLogo" style="width:48px;height:48px;background:#eee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;">&#127891;</div>
                 <div>
-                  <div style="font-weight:600;font-size:16px;" id="previewSchoolName">โรงเรียนนราศึกษาธิการ</div>
+                  <div style="font-weight:600;font-size:16px;" id="previewSchoolName">โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์</div>
                   <div style="font-size:12px;color:#666;" id="previewAddress">-</div>
                 </div>
               </div>
@@ -682,7 +682,7 @@
     function loadSettings() {
       var s = JSON.parse(localStorage.getItem('nited_settings') || '{}');
       var logo = s.logoUrl || '';
-      var name = s.schoolName || 'โรงเรียนนราศึกษาธิการ';
+      var name = s.schoolName || 'โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์';
       var addr = s.address || '';
       var primary = s.primaryColor || '#1a5276';
       var secondary = s.secondaryColor || '#e74c3c';
@@ -734,7 +734,7 @@
     function syncPreview() {
       updatePreview(
         document.getElementById('setLogoUrl').value.trim(),
-        document.getElementById('setSchoolName').value.trim() || 'โรงเรียนนราศึกษาธิการ',
+        document.getElementById('setSchoolName').value.trim() || 'โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์',
         document.getElementById('setAddress').value.trim(),
         document.getElementById('setPrimaryColor').value,
         document.getElementById('setSecondaryColor').value
@@ -744,7 +744,7 @@
     function saveSettings() {
       var settings = {
         logoUrl: document.getElementById('setLogoUrl').value.trim(),
-        schoolName: document.getElementById('setSchoolName').value.trim() || 'โรงเรียนนราศึกษาธิการ',
+        schoolName: document.getElementById('setSchoolName').value.trim() || 'โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์',
         address: document.getElementById('setAddress').value.trim(),
         primaryColor: document.getElementById('setPrimaryColor').value,
         secondaryColor: document.getElementById('setSecondaryColor').value

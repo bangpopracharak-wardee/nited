@@ -1,5 +1,5 @@
 /* ============================================================
-   ระบบนิเทศภายในโรงเรียนนราศึกษาธิการ - Core JavaScript
+   ระบบนิเทศภายในโรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์ - Core JavaScript
    รองรับทั้ง GitHub Pages + Apps Script API
    ============================================================ */
 
@@ -302,7 +302,7 @@ function printReport(title, content) {
       .footer{margin-top:30px;text-align:right;font-size:11px;color:#666;}
       @media print{.no-print{display:none;}}
     </style></head><body>
-    <h2>โรงเรียนนราศึกษาธิการ</h2><h3>${title}</h3>
+    <h2>โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์</h2><h3>${title}</h3>
     <button class="no-print" onclick="window.print()" style="position:fixed;top:10px;right:10px;padding:8px 16px;background:#1a5276;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">&#128424; พิมพ์</button>
     ${content}
     <div class="footer">พิมพ์วันที่: ${new Date().toLocaleDateString('th-TH')} เวลา: ${new Date().toLocaleTimeString('th-TH')}</div>

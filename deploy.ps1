@@ -1,5 +1,5 @@
 # ============================================================
-# Deploy Script - ระบบนิเทศภายในโรงเรียนนราศึกษาธิการ
+# Deploy Script - ระบบนิเทศภายในโรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์
 # รันคำสั่งนี้ใน PowerShell เพื่อ Deploy Apps Script
 # ============================================================
 
@@ -7,7 +7,7 @@ $CLASP = "C:\Users\NARAPEO\AppData\Roaming\npm\clasp.cmd"
 $SCRIPT_DIR = "D:\nited\apps-script"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  ระบบนิเทศภายในโรงเรียนนราศึกษาธิการ" -ForegroundColor Cyan
+Write-Host "  ระบบนิเทศภายในโรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์" -ForegroundColor Cyan
 Write-Host "  Deploy Apps Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
