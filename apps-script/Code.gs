@@ -11,7 +11,8 @@ const SHEETS = {
   BOOKING: 'Booking',
   FILES: 'Files',
   EVALUATION: 'Supervision',
-  USERS: 'Users'
+  USERS: 'Users',
+  INSPECTIONS: 'Inspections'
 };
 
 const STATUS = {
@@ -88,6 +89,9 @@ function doPost(e) {
       case 'getTimeSlots': return jsonResponse(getTimeSlots());
       case 'getClassLevels': return jsonResponse(getClassLevels());
       case 'getDepartments': return jsonResponse(getDepartments());
+      case 'createInspection': return jsonResponse(createInspection(data));
+      case 'getInspections': return jsonResponse(getInspections(data));
+      case 'deleteInspection': return jsonResponse(deleteInspection(data));
       default: return jsonResponse({ success: false, message: 'ไม่รู้จักคำสั่ง' });
     }
   } catch (err) {
@@ -123,7 +127,8 @@ function initializeSheet(sheet, name) {
     [SHEETS.BOOKING]: ['Timestamp', 'Date', 'Time', 'Teacher Name', 'Department', 'Period', 'Subject Name', 'Subject Code', 'Class Level', 'Room', 'Status', 'Notes'],
     [SHEETS.FILES]: ['Timestamp', 'Teacher Name', 'Booking ID', 'File Type', 'File Name', 'File URL', 'Drive File ID', 'Status', 'Admin Note', 'Reviewed By', 'Reviewed Date'],
     [SHEETS.EVALUATION]: ['Timestamp', 'Teacher Name', 'Supervision Date', 'Booking ID', 'Strengths', 'Improvements', 'Suggestions', 'Quality Level', 'Score', 'Evaluated By', 'Booking Reference'],
-    [SHEETS.USERS]: ['Username', 'Password', 'Full Name', 'Role', 'Department', 'Active']
+    [SHEETS.USERS]: ['Username', 'Password', 'Full Name', 'Role', 'Department', 'Active'],
+    [SHEETS.INSPECTIONS]: ['Timestamp', 'Supervision Type', 'Supervisor Name', 'Teacher Name', 'Subject Group', 'Subject Name', 'Grade Level', 'Period', 'Teaching Date', 'Topic', 'Techniques', 'Scores', 'Total Score', 'Strengths', 'Improvements', 'Suggestions', 'Evaluated By']
   };
 
   if (headers[name]) {
@@ -599,6 +604,83 @@ function deleteEvaluation(data) {
     const sheet = getSheet(SHEETS.EVALUATION);
     sheet.deleteRow(data.rowNumber);
     return { success: true, message: 'ลบผลการประเมินสำเร็จ' };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
+
+// ============================================================
+// Inspection Management (25-item evaluation form)
+// ============================================================
+
+function createInspection(data) {
+  try {
+    const sheet = getSheet(SHEETS.INSPECTIONS);
+
+    const row = [
+      formatDateTime(new Date()),
+      data.supervisionType || '',
+      data.supervisorName || '',
+      data.teacherName || '',
+      data.subjectGroup || '',
+      data.subjectName || '',
+      data.gradeLevel || '',
+      data.period || '',
+      data.teachingDate || '',
+      data.topic || '',
+      data.techniques || '',
+      data.scores || '',
+      data.totalScore || '',
+      data.strengths || '',
+      data.improvements || '',
+      data.suggestions || '',
+      data.evaluatedBy || ''
+    ];
+
+    sheet.appendRow(row);
+
+    return {
+      success: true,
+      message: 'บันทึกผลการนิเทศสำเร็จ'
+    };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
+
+function getInspections(data) {
+  try {
+    const sheet = getSheet(SHEETS.INSPECTIONS);
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0];
+    let inspections = [];
+
+    for (let i = 1; i < allData.length; i++) {
+      const row = {};
+      row.rowNumber = i + 1;
+      for (let j = 0; j < headers.length; j++) {
+        row[headers[j]] = allData[i][j];
+      }
+
+      if (data && data.teacherName && allData[i][3] !== data.teacherName) continue;
+      if (data && data.supervisorName && allData[i][2] !== data.supervisorName) continue;
+
+      inspections.push(row);
+    }
+
+    inspections.reverse();
+
+    return { success: true, inspections: inspections };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
+
+function deleteInspection(data) {
+  try {
+    const sheet = getSheet(SHEETS.INSPECTIONS);
+    sheet.deleteRow(data.rowNumber);
+    return { success: true, message: 'ลบรายการนิเทศสำเร็จ' };
   } catch (err) {
     return { success: false, message: err.toString() };
   }
@@ -1161,7 +1243,7 @@ function getClassLevels() {
 
 function setupSheets() {
   const results = [];
-  const names = [SHEETS.BOOKING, SHEETS.FILES, SHEETS.EVALUATION, SHEETS.USERS];
+  const names = [SHEETS.BOOKING, SHEETS.FILES, SHEETS.EVALUATION, SHEETS.USERS, SHEETS.INSPECTIONS];
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   names.forEach(name => {
