@@ -6,9 +6,63 @@
   <title>รายงาน - โรงเรียนนราศึกษาธิการ</title>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .tab-nav{display:flex;gap:0;border-bottom:3px solid var(--border);margin-bottom:24px;}
+    .tab-btn{padding:12px 28px;cursor:pointer;font-weight:600;font-size:15px;border:none;background:transparent;color:var(--text-light);border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;}
+    .tab-btn:hover{color:var(--primary);}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);background:rgba(26,82,118,.04);}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+
+    /* Print form styles */
+    .print-form{background:white;border:2px solid #333;padding:0;font-family:'Sarabun',sans-serif;color:#000;max-width:800px;margin:0 auto;}
+    .print-form .pf-header{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 20px 8px;font-size:14px;}
+    .print-form .pf-header .school{font-weight:700;}
+    .print-form .pf-header .form-title{font-weight:700;font-size:16px;}
+    .print-form .pf-sub{padding:4px 20px 8px;font-size:13px;}
+    .print-form .pf-info{padding:8px 20px;font-size:13px;line-height:2.2;}
+    .print-form .pf-legend{padding:8px 20px;font-size:12px;background:#f5f5f5;border-top:1px solid #ccc;border-bottom:1px solid #ccc;}
+    .print-form .pf-legend b{color:#333;}
+    .print-form table.eval{width:100%;border-collapse:collapse;font-size:12px;}
+    .print-form table.eval th,table.eval td{border:1px solid #333;padding:6px 8px;}
+    .print-form table.eval th{background:#1a5276;color:white;text-align:center;font-weight:600;}
+    .print-form table.eval th:first-child{text-align:left;width:55%;}
+    .print-form table.eval td:first-child{font-size:12px;}
+    .print-form table.eval td:not(:first-child){text-align:center;width:32px;}
+    .print-form table.eval td.comment-col{width:auto;min-width:120px;}
+    .print-form table.eval tr.cat-row td{background:#e8f0fe;font-weight:700;color:#1a5276;font-size:13px;}
+    .print-form .pf-techniques{padding:10px 20px;font-size:12px;border-top:1px solid #ccc;}
+    .print-form .pf-techniques .tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 12px;}
+    .print-form .pf-techniques .tech-item{display:flex;align-items:center;gap:4px;}
+    .print-form .pf-techniques .tech-box{width:14px;height:14px;border:1.5px solid #333;display:inline-flex;align-items:center;justify-content:center;font-size:10px;}
+    .print-form .pf-total{padding:12px 20px;border-top:2px solid #333;display:flex;justify-content:space-between;font-size:14px;font-weight:700;}
+    .print-form .pf-sign{padding:16px 20px;font-size:13px;border-top:1px solid #ccc;}
+    .print-form .pf-sign-row{display:flex;justify-content:space-between;margin-top:12px;}
+    .print-form .pf-sign-col{text-align:center;min-width:200px;}
+    .print-form .pf-sign-line{border-top:1px solid #333;width:200px;margin:40px auto 4px;}
+    .print-form .pf-notes{padding:12px 20px;font-size:11px;border-top:1px solid #ccc;background:#fafafa;}
+    .print-form .pf-notes p{margin:4px 0;}
+    .print-form .pf-comments{padding:16px 20px;font-size:13px;border-top:2px solid #333;}
+    .print-form .pf-comments h4{font-size:14px;margin:12px 0 4px;color:#1a5276;}
+    .print-form .pf-comments .line{border-bottom:1px dotted #999;height:24px;margin-bottom:2px;}
+    .print-form .pf-comments .sig-area{margin-top:12px;text-align:right;font-size:13px;}
+    .print-form .pf-comments .sig-area .sig-line{border-top:1px solid #333;width:180px;display:inline-block;margin-top:40px;}
+
+    @media print{
+      body{background:white!important;padding:0!important;margin:0!important;}
+      .navbar,.page-header,.tab-nav,.no-print,.stats-grid,.card,.grid-2,.filter-bar,.pf-footer-btns{display:none!important;}
+      .main-content{padding:0!important;margin:0!important;}
+      .print-form{border:none;box-shadow:none;margin:0;max-width:100%;}
+      .tab-panel{display:block!important;}
+      #tabSummary{display:none!important;}
+      #tabIndividual{display:block!important;}
+      .print-form .pf-comments .line{border-bottom:1px dotted #999;}
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
+
+  <nav class="navbar no-print">
     <div class="navbar-inner">
       <a href="../index.html" class="navbar-brand">
         <div class="logo">&#127891;</div>
@@ -30,36 +84,64 @@
   </nav>
 
   <div class="main-content">
-    <div class="page-header">
+    <div class="page-header no-print">
       <h1>&#128202; รายงานและสถิติ</h1>
-      <p>ดูรายงานสถิติ วิเคราะห์ผลการนิเทศ และพิมพ์เอกสาร</p>
+      <p>ดูรายงาน วิเคราะห์ผลการนิเทศ และพิมพ์เอกสาร</p>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-icon blue">&#128197;</div><div class="stat-info"><h4 id="rptTotalBookings">0</h4><p>การจองทั้งหมด</p></div></div>
-      <div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><h4 id="rptCompleted">0</h4><p>นิเทศแล้ว</p></div></div>
-      <div class="stat-card"><div class="stat-icon orange">&#128194;</div><div class="stat-info"><h4 id="rptTotalFiles">0</h4><p>ไฟล์งาน</p></div></div>
-      <div class="stat-card"><div class="stat-icon purple">&#11088;</div><div class="stat-info"><h4 id="rptTotalEval">0</h4><p>ผลประเมิน</p></div></div>
+    <div class="tab-nav no-print">
+      <button class="tab-btn active" onclick="switchTab('summary')">&#128200; รายงานภาพรวม</button>
+      <button class="tab-btn" onclick="switchTab('individual')">&#128100; รายงานรายบุคคล</button>
     </div>
 
-    <div class="grid-2" style="margin-bottom:20px;">
-      <div class="card"><div class="card-header"><h3>&#128202; สถิติสถานะการจอง</h3></div><div class="card-body"><div id="bookingStatusChart"></div></div></div>
-      <div class="card"><div class="card-header"><h3>&#11088; สถิติระดับคุณภาพ</h3></div><div class="card-body"><div id="qualityChart"></div></div></div>
-    </div>
+    <!-- ============ รายงานภาพรวม ============ -->
+    <div id="tabSummary" class="tab-panel active">
+      <div class="stats-grid no-print">
+        <div class="stat-card"><div class="stat-icon blue">&#128197;</div><div class="stat-info"><h4 id="rptTotalBookings">0</h4><p>การจองทั้งหมด</p></div></div>
+        <div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><h4 id="rptCompleted">0</h4><p>นิเทศแล้ว</p></div></div>
+        <div class="stat-card"><div class="stat-icon orange">&#128194;</div><div class="stat-info"><h4 id="rptTotalFiles">0</h4><p>ไฟล์งาน</p></div></div>
+        <div class="stat-card"><div class="stat-icon purple">&#11088;</div><div class="stat-info"><h4 id="rptTotalEval">0</h4><p>ผลประเมิน</p></div></div>
+      </div>
 
-    <div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>&#127979; สถิติกลุ่มสาระ</h3></div><div class="card-body"><div id="deptReportChart"></div></div></div>
+      <div class="grid-2 no-print" style="margin-bottom:20px;">
+        <div class="card"><div class="card-header"><h3>&#128202; สถานะการจอง</h3></div><div class="card-body"><div id="bookingStatusChart"></div></div></div>
+        <div class="card"><div class="card-header"><h3>&#11088; ระดับคุณภาพ</h3></div><div class="card-body"><div id="qualityChart"></div></div></div>
+      </div>
 
-    <div class="card" style="margin-bottom:20px;">
-      <div class="card-header"><h3>&#128100; สถิติครูผู้สอน</h3></div>
-      <div class="card-body" style="padding:0;">
-        <div class="table-responsive">
-          <table><thead><tr><th>ชื่อครู</th><th>การจอง</th><th>นิเทศแล้ว</th><th>ไฟล์งาน</th></tr></thead>
-          <tbody id="teacherStatsTable"><tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr></tbody></table>
+      <div class="card no-print" style="margin-bottom:20px;"><div class="card-header"><h3>&#127979; สถิติกลุ่มสาระ</h3></div><div class="card-body"><div id="deptReportChart"></div></div></div>
+
+      <div class="card no-print" style="margin-bottom:20px;">
+        <div class="card-header"><h3>&#128100; สถิติครูผู้สอน</h3></div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table><thead><tr><th>ชื่อครู</th><th>กลุ่มสาระ</th><th>การจอง</th><th>นิเทศแล้ว</th><th>ค่าเฉลี่ยคะแนน</th></tr></thead>
+            <tbody id="teacherStatsTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody></table>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="card"><div class="card-header"><h3>&#128197; ปฏิทินการนิเทศ</h3></div><div class="card-body" style="padding:0;"><div id="reportCalendar"></div></div></div>
+    <!-- ============ รายงานรายบุคคล ============ -->
+    <div id="tabIndividual" class="tab-panel">
+      <div class="filter-bar no-print" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:13px;font-weight:600;">เลือกครูผู้สอน</label>
+          <select class="form-control" id="rptTeacher" style="min-width:220px;">
+            <option value="">-- ทั้งหมด --</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:13px;font-weight:600;">วันที่นิเทศ</label>
+          <input type="date" class="form-control" id="rptDate">
+        </div>
+        <button class="btn btn-primary" onclick="loadIndividualReport()" style="margin-bottom:0;">&#128269; ค้นหา</button>
+        <button class="btn btn-secondary" onclick="printReport()" style="margin-bottom:0;">&#128424; พิมพ์</button>
+        <button class="btn btn-secondary" onclick="exportPDF()" style="margin-bottom:0;">&#128196; บันทึก PDF</button>
+      </div>
+
+      <div id="individualReportList"></div>
+      <div id="individualReportForm"></div>
+    </div>
   </div>
 
   <script src="../js/config.js"></script>
@@ -67,6 +149,23 @@
   <script>
     if (!checkAuth()) { window.location.href = '../index.html'; }
 
+    var allInspections = [];
+    var allTeachers = [];
+
+    // ========== Tab Switching ==========
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+      if (tab === 'summary') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tabSummary').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tabIndividual').classList.add('active');
+      }
+    }
+
+    // ========== Summary Report ==========
     function makeBar(label, value, max, color) {
       var pct = max > 0 ? (value / max) * 100 : 0;
       return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">' +
@@ -76,9 +175,8 @@
         '</div></div>';
     }
 
-    function loadReportStats() {
-      apiPost('getDashboardStats', {})
-        .then(function(result) {
+    function loadSummaryReport() {
+      apiPost('getDashboardStats', {}).then(function(result) {
         if (!result.success) return;
         var s = result.stats;
         document.getElementById('rptTotalBookings').textContent = s.totalBookings;
@@ -104,31 +202,287 @@
         var deptKeys = Object.keys(dept);
         var maxD = 1;
         deptKeys.forEach(function(k) { if (dept[k].total > maxD) maxD = dept[k].total; });
-        if (deptKeys.length > 0) {
-          document.getElementById('deptReportChart').innerHTML = deptKeys.map(function(k) {
-            return makeBar(k, dept[k].total, maxD, '#1a5276');
-          }).join('');
-        } else {
-          document.getElementById('deptReportChart').innerHTML = '<div class="empty-state"><p>ยังไม่มีข้อมูล</p></div>';
-        }
+        document.getElementById('deptReportChart').innerHTML = deptKeys.length > 0
+          ? deptKeys.map(function(k) { return makeBar(k, dept[k].total, maxD, '#1a5276'); }).join('')
+          : '<div class="empty-state"><p>ยังไม่มีข้อมูล</p></div>';
 
         var teacherKeys = Object.keys(s.teacherStats || {});
         var tbody = document.getElementById('teacherStatsTable');
         if (teacherKeys.length > 0) {
           tbody.innerHTML = teacherKeys.map(function(t) {
             var ts = s.teacherStats[t];
-            return '<tr><td>' + escapeHtml(t) + '</td><td>' + ts.total + '</td><td>' + ts.completed + '</td><td>' + ts.files + '</td></tr>';
+            return '<tr><td>' + escapeHtml(t) + '</td><td>-</td><td>' + ts.total + '</td><td>' + ts.completed + '</td><td>-</td></tr>';
           }).join('');
         } else {
-          tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><p>ยังไม่มีข้อมูล</p></div></td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>ยังไม่มีข้อมูล</p></div></td></tr>';
         }
-      }).catch(function(e){console.error(e);});
+      }).catch(function(e){ console.error(e); });
     }
 
+    // ========== Individual Report ==========
+    function loadTeacherDropdown() {
+      apiPost('getTeachers', {}).then(function(r) {
+        if (r.success && r.teachers) {
+          allTeachers = r.teachers;
+          var sel = document.getElementById('rptTeacher');
+          r.teachers.forEach(function(t) {
+            var o = document.createElement('option');
+            o.value = t; o.textContent = t;
+            sel.appendChild(o);
+          });
+        }
+      });
+    }
+
+    function loadInspectionData() {
+      return apiPost('getInspections', {}).then(function(r) {
+        if (r.success) allInspections = r.inspections || [];
+      });
+    }
+
+    function loadIndividualReport() {
+      var teacher = document.getElementById('rptTeacher').value;
+      var date = document.getElementById('rptDate').value;
+
+      var filtered = allInspections.filter(function(ins) {
+        if (teacher && ins['Teacher Name'] !== teacher) return false;
+        if (date) {
+          var insDate = new Date(ins['Teaching Date']);
+          var filterDate = new Date(date);
+          if (insDate.toDateString() !== filterDate.toDateString()) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        document.getElementById('individualReportList').innerHTML = '<div class="card"><div class="card-body"><div class="empty-state"><p>&#128269; ไม่พบข้อมูลการนิเทศ</p><p style="font-size:13px;color:var(--text-light);">ลองเปลี่ยนเงื่อนไขการค้นหา</p></div></div></div>';
+        document.getElementById('individualReportForm').innerHTML = '';
+        return;
+      }
+
+      var listHtml = '<div class="card no-print" style="margin-bottom:16px;"><div class="card-header"><h3>&#128203; พบ ' + filtered.length + ' รายการ</h3></div><div class="card-body" style="padding:0;"><div class="table-responsive"><table><thead><tr><th>วันที่</th><th>ครูผู้สอน</th><th>กลุ่มสาระ</th><th>เรื่อง</th><th>คะแนน</th><th></th></tr></thead><tbody>';
+      filtered.forEach(function(ins, idx) {
+        var d = ins['Teaching Date'] ? new Date(ins['Teaching Date']).toLocaleDateString('th-TH') : '-';
+        listHtml += '<tr><td>' + d + '</td><td>' + escapeHtml(ins['Teacher Name']||'') + '</td><td>' + escapeHtml(ins['Subject Group']||'') + '</td><td>' + escapeHtml(ins['Topic']||'') + '</td><td><b>' + (ins['Total Score']||'-') + '/100</b></td><td><button class="btn btn-sm btn-primary" onclick="showPrintForm(' + idx + ')">&#128424; พิมพ์</button></td></tr>';
+      });
+      listHtml += '</tbody></table></div></div></div>';
+      document.getElementById('individualReportList').innerHTML = listHtml;
+      document.getElementById('individualReportForm').innerHTML = '';
+
+      window._filteredInspections = filtered;
+    }
+
+    // ========== 25-item criteria (same as evaluation.html) ==========
+    var criteria = [
+      {category:"ด้านการเตรียมการสอน", items:[
+        "จัดทำแผนการเรียนรู้ครบองค์ประกอบ",
+        "จัดเตรียมวัสดุ-อุปกรณ์ สื่อ นวัตกรรม กิจกรรมตามแผนฯ"
+      ]},
+      {category:"ด้านการจัดกิจกรรมการเรียนรู้", items:[
+        "มีวิธีการนำเข้าสู่บทเรียนที่น่าสนใจ แจ้งวัตถุประสงค์การเรียนรู้",
+        "ใช้เทคนิคการสอนที่หลากหลาย เน้นผู้เรียนเป็นสำคัญ",
+        "จัดกิจกรรมที่ส่งเสริมให้ค้นคว้าหาคำตอบด้วยตนเอง",
+        "จัดกิจกรรมที่ตอบสนองความแตกต่างระหว่างบุคคล",
+        "จัดกิจกรรมที่เน้นกระบวนการคิด (วิเคราะห์ สังเคราะห์ สร้างสรรค์)",
+        "จัดกิจกรรมให้ผู้เรียนมีส่วนร่วมและแสดงความคิดเห็นเสรี",
+        "มีการสอดแทรกคุณธรรม จริยธรรมและคุณลักษณะอันพึงประสงค์",
+        "มีการเสริมแรงเมื่อนักเรียนปฏิบัติหรือตอบถูกต้อง",
+        "มีการสรุปประเด็น สาระ เนื้อหาในกิจกรรมการเรียนรู้",
+        "มอบหมายงานเหมาะสมตามศักยภาพผู้เรียนและเอาใจใส่ดูแล",
+        "ใช้เวลาสอนเหมาะสมกับเวลาที่กำหนด"
+      ]},
+      {category:"ด้านสื่อ นวัตกรรม แหล่งเรียนรู้", items:[
+        "ใช้สื่อที่เหมาะสมกับกิจกรรมและศักยภาพของผู้เรียน",
+        "ใช้สื่อ แหล่งการเรียนรู้อย่างหลากหลาย"
+      ]},
+      {category:"ด้านการวัดและประเมินผล", items:[
+        "สอดคล้องและครอบคลุมจุดประสงค์",
+        "ประเมินผลอย่างหลากหลายและครบทั้ง 3 ด้าน (K.P.A.)"
+      ]},
+      {category:"ด้านสภาพทั่วไป", items:[
+        "การตรงต่อเวลา",
+        "การควบคุมความเป็นระเบียบในชั้นเรียน",
+        "การจัดบรรยากาศในชั้นเรียน (การจัดห้อง ความสะอาด)"
+      ]},
+      {category:"ด้านบุคลิกภาพ", items:[
+        "แต่งกายสุภาพ สะอาดเรียบร้อย เหมาะสมกับกาลเทศะ",
+        "ใช้ถ้อยคำสุภาพ ถูกต้อง ระดับเสียงดังชัดเจน",
+        "ยิ้มแย้มแจ่มใส และควบคุมอารมณ์ในระหว่างสอนได้ดี",
+        "เคลื่อนไหวและแสดงท่าทางในการสอนอย่างมีจุดหมาย",
+        "แสดงความรัก ความเมตตา กรุณา เอื้ออาทรต่อศิษย์"
+      ]}
+    ];
+
+    var techniquesList = [
+      "กระบวนการสืบค้น","การเรียนแบบค้นพบ","การเรียนแบบแก้ปัญหา",
+      "การเรียนแบบสร้างแผนผัง","การตั้งคำถาม","เทคนิคคู่คิด",
+      "การศึกษาเป็นรายบุคคล","การฝึกปฏิบัติ/ทดลอง","เกม",
+      "การอภิปราย","กิจกรรมกลุ่ม","บูรณาการกลุ่มสาระอื่น"
+    ];
+
+    function getQualityLevel(score) {
+      if (score < 60) return 'ต้องปรับปรุง';
+      if (score < 70) return 'ยอมรับได้ (ควรปรับปรุง)';
+      if (score < 80) return 'ค่อนข้างดี';
+      if (score < 90) return 'ดี';
+      return 'ดีมาก เป็นตัวอย่างที่ดี';
+    }
+
+    function showPrintForm(idx) {
+      var ins = window._filteredInspections[idx];
+      if (!ins) return;
+
+      var scores = (ins['Scores'] || '').split(',').map(function(s){ return parseInt(s)||0; });
+      var techniques = (ins['Techniques'] || '').split(',').map(function(s){ return s.trim(); });
+      var totalScore = parseInt(ins['Total Score']) || 0;
+      var pct = totalScore;
+      var level = getQualityLevel(totalScore);
+
+      var html = '<div class="print-form" id="printArea">';
+
+      // Header
+      html += '<div class="pf-header"><span class="school">โรงเรียนนราศึกษาธิการ</span><span class="form-title">แบบบันทึกผลการนิเทศการสอน</span></div>';
+      html += '<div class="pf-sub">ตั้งแต่วันที่ ' + formatDateTH(ins['Teaching Date']) + '</div>';
+
+      // Supervision type
+      var isSchedule = ins['Supervision Type'] === 'Schedule';
+      html += '<div class="pf-sub" style="text-align:right;">☐ ' + (isSchedule ? '☑' : '☐') + ' Schedule &nbsp;&nbsp; ☐ ' + (!isSchedule ? '☑' : '☐') + ' Impromptu</div>';
+
+      // Info
+      html += '<div class="pf-info">';
+      html += '<b>ชื่อผู้รับการนิเทศการสอน</b> ' + escapeHtml(ins['Teacher Name']||'') + '<br>';
+      html += '<b>กลุ่มสาระ</b> ' + escapeHtml(ins['Subject Group']||'') + ' &nbsp;&nbsp; <b>สอนระดับชั้น</b> ' + escapeHtml(ins['Grade Level']||'') + ' &nbsp;&nbsp; <b>คาบที่</b> ' + escapeHtml(ins['Period']||'') + ' &nbsp;&nbsp; <b>สอนวันที่</b> ' + formatDateTH(ins['Teaching Date']);
+      html += '<br><b>แผนการเรียนรู้</b> ' + escapeHtml(ins['Subject Name']||'') + ' &nbsp;&nbsp; <b>สาระการเรียนรู้</b> ' + escapeHtml(ins['Subject Group']||'') + ' &nbsp;&nbsp; <b>เรื่อง</b> ' + escapeHtml(ins['Topic']||'');
+      html += '</div>';
+
+      // Legend
+      html += '<div class="pf-legend"><b>คำขึ้นต้น</b> โปรดให้คะแนนในช่องที่ทำเครื่องหมาย &nbsp;&nbsp; <b>ระดับคะแนน</b> 0=ไม่มีคุณค่าที่ดี 1=มีคุณค่าน้อยมาก ควรปรับปรุงพัฒนา 2=มีคุณค่าพอใช้ เป็นที่ยอมรับได้ 3=มีการรักที่ดี 4=มีคุณค่าดีมาก</div>';
+
+      // Techniques
+      html += '<div class="pf-techniques"><b>เทคนิคการสอน:</b> ';
+      html += '<div class="tech-grid">';
+      techniquesList.forEach(function(t) {
+        var checked = techniques.indexOf(t) >= 0;
+        html += '<div class="tech-item"><span class="tech-box">' + (checked ? '✓' : '') + '</span> ' + t + '</div>';
+      });
+      html += '</div></div>';
+
+      // Evaluation table
+      html += '<table class="eval"><thead><tr><th>รายการประเมิน</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>ความเห็นเพิ่มเติม</th></tr></thead><tbody>';
+      var q = 0;
+      criteria.forEach(function(group) {
+        html += '<tr class="cat-row"><td colspan="7"><b>' + group.category + '</b></td></tr>';
+        group.items.forEach(function(item) {
+          var score = scores[q] || 0;
+          var cells = '';
+          for (var s = 0; s <= 4; s++) {
+            cells += '<td>' + (score === s ? '✓' : '') + '</td>';
+          }
+          html += '<tr><td>' + (q+1) + '. ' + item + '</td>' + cells + '<td class="comment-col"></td></tr>';
+          q++;
+        });
+      });
+      html += '</tbody></table>';
+
+      // Total
+      html += '<div class="pf-total"><span>รวมคะแนน</span><span>' + totalScore + ' / 100 &nbsp;&nbsp; ร้อยละ ' + pct.toFixed(1) + '% &nbsp;&nbsp; ' + level + '</span></div>';
+
+      // Signature
+      html += '<div class="pf-sign"><div class="pf-sign-row">';
+      html += '<div class="pf-sign-col">ลงชื่อ <u>' + escapeHtml(ins['Supervisor Name']||'........................') + '</u> ผู้รับการนิเทศการสอน<br>(<u>' + escapeHtml(ins['Teacher Name']||'') + '</u>)</div>';
+      html += '<div class="pf-sign-col">ลงชื่อ <u>' + escapeHtml(ins['Evaluated By']||'........................') + '</u> ผู้นิเทศการสอน<br>(<u>' + escapeHtml(ins['Supervisor Name']||'') + '</u>)</div>';
+      html += '</div></div>';
+
+      // Notes
+      html += '<div class="pf-notes">';
+      html += '<p><b>หมายเหตุ 1.</b> ผู้นิเทศ ☐ ผู้บริหาร ☐ หัวหน้ากลุ่มสาระ/ผู้ช่วย ☐ ผู้ชำนาญการ ☐ เพื่อนช่วยเพื่อน ☐ อื่นๆ...........</p>';
+      html += '<p><b>หมายเหตุ 2.</b> (K.P.A.) หมายถึง K = Knowledge ความรู้ &nbsp; P = Practice ทักษะ/การปฏิบัติ &nbsp; A = Attitude เจตคติ/คุณลักษณะอันพึงประสงค์</p>';
+      html += '<p><b>หมายเหตุ 3.</b> เกณฑ์การประเมิน ☐ ต่ำกว่า 60 ไม่ผ่าน,ต้องปรับปรุง ☐ ร้อยละ 60-69 พอรับได้,ควรปรับปรุง ☐ ร้อยละ 70-79 ค่อนข้างดี ☐ ร้อยละ 80-89 ดี ☐ ร้อยละ 90 ขึ้นไป ดีมาก เป็นตัวอย่างที่ดี</p>';
+      html += '</div>';
+
+      // Comments page
+      html += '<div class="pf-comments" style="page-break-before:always;">';
+      html += '<h4>จุดเด่น/คำชมเชย/ขอยกย่อง</h4>';
+      for (var i = 0; i < 4; i++) html += '<div class="line"></div>';
+      html += '<h4>จุดที่ควรพัฒนา</h4>';
+      for (var i = 0; i < 4; i++) html += '<div class="line"></div>';
+      html += '<h4>ข้อเสนอแนะอื่นๆ</h4>';
+      for (var i = 0; i < 4; i++) html += '<div class="line"></div>';
+      html += '<h4>นำเอาไปนิเทศครั้งต่อไป</h4>';
+      for (var i = 0; i < 4; i++) html += '<div class="line"></div>';
+      html += '<div class="sig-area">ลงชื่อ <span class="sig-line"></span><br>ผู้นิเทศการสอน<br>(<u>' + escapeHtml(ins['Supervisor Name']||'') + '</u>)</div>';
+      html += '</div>';
+
+      html += '</div>';
+
+      // Show in modal-like area
+      document.getElementById('individualReportList').innerHTML = '';
+      document.getElementById('individualReportForm').innerHTML = '<div class="card"><div class="card-header"><h3>&#128196; แบบบันทึกผลการนิเทศการสอน</h3></div><div class="card-body" style="padding:0;overflow-x:auto;">' + html + '</div></div>';
+    }
+
+    function printReport() {
+      var el = document.getElementById('printArea');
+      if (!el) { alert('กรุณาเลือกรายการก่อนพิมพ์'); return; }
+      var w = window.open('', '_blank');
+      w.document.write('<!DOCTYPE html><html><head><title>พิมพ์รายงาน</title>');
+      w.document.write('<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">');
+      w.document.write('<style>');
+      w.document.write('body{font-family:"Sarabun",sans-serif;margin:0;padding:20px;color:#000;font-size:13px;}');
+      w.document.write('.print-form{max-width:800px;margin:0 auto;}');
+      w.document.write('.pf-header{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;font-size:14px;}');
+      w.document.write('.pf-header .school{font-weight:700;}');
+      w.document.write('.pf-header .form-title{font-weight:700;font-size:16px;}');
+      w.document.write('.pf-sub{padding:4px 0;font-size:13px;}');
+      w.document.write('.pf-info{padding:8px 0;font-size:13px;line-height:2.2;}');
+      w.document.write('.pf-legend{padding:8px 0;font-size:12px;background:#f5f5f5;border-top:1px solid #ccc;border-bottom:1px solid #ccc;}');
+      w.document.write('.pf-legend b{color:#333;}');
+      w.document.write('table.eval{width:100%;border-collapse:collapse;font-size:12px;}');
+      w.document.write('table.eval th,table.eval td{border:1px solid #333;padding:5px 6px;}');
+      w.document.write('table.eval th{background:#1a5276;color:white;text-align:center;font-weight:600;}');
+      w.document.write('table.eval th:first-child{text-align:left;}');
+      w.document.write('table.eval td:first-child{font-size:11px;}');
+      w.document.write('table.eval td:not(:first-child){text-align:center;width:28px;}');
+      w.document.write('table.eval td.comment-col{width:auto;min-width:100px;}');
+      w.document.write('table.eval tr.cat-row td{background:#e8f0fe;font-weight:700;color:#1a5276;font-size:12px;}');
+      w.document.write('.pf-techniques{padding:8px 0;font-size:11px;border-top:1px solid #ccc;}');
+      w.document.write('.pf-techniques .tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 12px;}');
+      w.document.write('.pf-techniques .tech-item{display:flex;align-items:center;gap:4px;}');
+      w.document.write('.pf-techniques .tech-box{width:12px;height:12px;border:1.5px solid #333;display:inline-flex;align-items:center;justify-content:center;font-size:9px;}');
+      w.document.write('.pf-total{padding:10px 0;border-top:2px solid #333;display:flex;justify-content:space-between;font-size:13px;font-weight:700;}');
+      w.document.write('.pf-sign{padding:12px 0;font-size:13px;border-top:1px solid #ccc;}');
+      w.document.write('.pf-sign-row{display:flex;justify-content:space-between;}');
+      w.document.write('.pf-sign-col{text-align:center;min-width:200px;}');
+      w.document.write('.pf-sign-line{border-top:1px solid #333;width:200px;margin:30px auto 4px;}');
+      w.document.write('.pf-notes{padding:8px 0;font-size:10px;border-top:1px solid #ccc;background:#fafafa;}');
+      w.document.write('.pf-notes p{margin:3px 0;}');
+      w.document.write('.pf-comments{padding:12px 0;font-size:13px;border-top:2px solid #333;page-break-before:always;}');
+      w.document.write('.pf-comments h4{font-size:13px;margin:10px 0 4px;color:#1a5276;}');
+      w.document.write('.pf-comments .line{border-bottom:1px dotted #999;height:22px;margin-bottom:2px;}');
+      w.document.write('.pf-comments .sig-area{margin-top:12px;text-align:right;font-size:12px;}');
+      w.document.write('.pf-comments .sig-area .sig-line{border-top:1px solid #333;width:160px;display:inline-block;margin-top:30px;}');
+      w.document.write('</style></head><body>');
+      w.document.write(el.innerHTML);
+      w.document.write('</body></html>');
+      w.document.close();
+      setTimeout(function(){ w.print(); w.close(); }, 500);
+    }
+
+    function exportPDF() {
+      printReport();
+    }
+
+    function formatDateTH(d) {
+      if (!d) return '-';
+      var dt = new Date(d);
+      var months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      return dt.getDate() + ' ' + months[dt.getMonth()] + ' ' + (dt.getFullYear() + 543);
+    }
+
+    // ========== Init ==========
     updateUserUI();
-    calendarDate = new Date();
-    loadCalendarEvents('reportCalendar');
-    loadReportStats();
+    loadSummaryReport();
+    loadTeacherDropdown();
+    loadInspectionData();
   </script>
 </body>
 </html>
