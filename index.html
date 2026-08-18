@@ -293,18 +293,10 @@
     var captchaAnswer = 0;
 
     function generateCaptcha() {
-      var ops = ['+', '-', 'x', '/'];
+      var ops = ['+', '-'];
       var op = ops[Math.floor(Math.random() * ops.length)];
       var a, b, answer;
-      if (op === '/') {
-        b = Math.floor(Math.random() * 9) + 2;
-        answer = Math.floor(Math.random() * 10) + 1;
-        a = b * answer;
-      } else if (op === 'x') {
-        a = Math.floor(Math.random() * 12) + 1;
-        b = Math.floor(Math.random() * 9) + 1;
-        answer = a * b;
-      } else if (op === '+') {
+      if (op === '+') {
         a = Math.floor(Math.random() * 20) + 1;
         b = Math.floor(Math.random() * 20) + 1;
         answer = a + b;
@@ -313,7 +305,7 @@
         b = Math.floor(Math.random() * Math.min(a, 10)) + 1;
         answer = a - b;
       }
-      var symbols = {'+':'+','-':'-','x':'&times;','/':'&divide;'};
+      var symbols = {'+':'+','-':'-'};
       document.getElementById('captchaQuestion').innerHTML = a + ' ' + symbols[op] + ' ' + b + ' = ?';
       captchaAnswer = answer;
       document.getElementById('loginCaptcha').value = '';
