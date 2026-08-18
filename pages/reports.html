@@ -205,12 +205,25 @@
           ? deptKeys.map(function(k) { return makeBar(k, dept[k].total, maxD, '#1a5276'); }).join('')
           : '<div class="empty-state"><p>ยังไม่มีข้อมูล</p></div>';
 
+        // Teacher stats with average from inspections
         var teacherKeys = Object.keys(s.teacherStats || {});
         var tbody = document.getElementById('teacherStatsTable');
         if (teacherKeys.length > 0) {
+          var teacherScores = {};
+          allInspections.forEach(function(ins) {
+            var t = ins['Teacher Name'];
+            var sc = parseInt(ins['Total Score']) || 0;
+            if (t && sc > 0) {
+              if (!teacherScores[t]) teacherScores[t] = { total: 0, count: 0 };
+              teacherScores[t].total += sc;
+              teacherScores[t].count++;
+            }
+          });
           tbody.innerHTML = teacherKeys.map(function(t) {
             var ts = s.teacherStats[t];
-            return '<tr><td>' + escapeHtml(t) + '</td><td>-</td><td>' + ts.total + '</td><td>' + ts.completed + '</td><td>-</td></tr>';
+            var avg = teacherScores[t] ? (teacherScores[t].total / teacherScores[t].count).toFixed(1) : '-';
+            var avgColor = avg !== '-' ? (parseFloat(avg) >= 90 ? '#27ae60' : parseFloat(avg) >= 80 ? '#3498db' : parseFloat(avg) >= 70 ? '#f39c12' : '#e74c3c') : '';
+            return '<tr><td>' + escapeHtml(t) + '</td><td>-</td><td>' + ts.total + '</td><td>' + ts.completed + '</td><td><b style="color:' + avgColor + '">' + avg + '</b>/100</td></tr>';
           }).join('');
         } else {
           tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>ยังไม่มีข้อมูล</p></div></td></tr>';
@@ -416,8 +429,8 @@
 
       // Signature
       html += '<div class="pf-sign"><div class="pf-sign-row">';
-      html += '<div class="pf-sign-col">ลงชื่อ <u>' + escapeHtml(ins['Supervisor Name']||'........................') + '</u> ผู้รับการนิเทศการสอน<br>(<u>' + escapeHtml(ins['Teacher Name']||'') + '</u>)</div>';
-      html += '<div class="pf-sign-col">ลงชื่อ <u>' + escapeHtml(ins['Evaluated By']||'........................') + '</u> ผู้นิเทศการสอน<br>(<u>' + escapeHtml(ins['Supervisor Name']||'') + '</u>)</div>';
+      html += '<div class="pf-sign-col">ลงชื่อ <u>' + escapeHtml(ins['Teacher Name']||'........................') + '</u> ผู้รับการนิเทศการสอน<br>(<u>' + escapeHtml(ins['Teacher Name']||'') + '</u>)</div>';
+      html += '<div class="pf-sign-col">ลงชื่อ <u>' + escapeHtml(ins['Supervisor Name']||ins['Evaluated By']||'........................') + '</u> ผู้นิเทศการสอน<br>(<u>' + escapeHtml(ins['Supervisor Name']||ins['Evaluated By']||'') + '</u>)</div>';
       html += '</div></div>';
 
       // Notes
