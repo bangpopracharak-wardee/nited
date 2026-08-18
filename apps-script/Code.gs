@@ -83,6 +83,11 @@ function doPost(e) {
       case 'updateUser': return jsonResponse(updateUser(data));
       case 'deleteUser': return jsonResponse(deleteUser(data));
       case 'toggleUserActive': return jsonResponse(toggleUserActive(data));
+      case 'getTeachers': return jsonResponse(getTeachers());
+      case 'getSubjects': return jsonResponse(getSubjects());
+      case 'getTimeSlots': return jsonResponse(getTimeSlots());
+      case 'getClassLevels': return jsonResponse(getClassLevels());
+      case 'getDepartments': return jsonResponse(getDepartments());
       default: return jsonResponse({ success: false, message: 'ไม่รู้จักคำสั่ง' });
     }
   } catch (err) {
