@@ -240,6 +240,14 @@
           <div class="login-remember">
             <label class="check-label"><input type="checkbox" id="loginRemember"> จำรหัสผ่าน</label>
           </div>
+          <div class="login-captcha">
+            <label>ยืนยันตัวตน <span class="required">*</span></label>
+            <div class="captcha-box">
+              <span class="captcha-question" id="captchaQuestion"></span>
+              <button type="button" class="btn-refresh-captcha" onclick="generateCaptcha()" title="สุ่มใหม่">&#128260;</button>
+            </div>
+            <input type="text" class="form-control" id="loginCaptcha" placeholder="คำตอบ" inputmode="numeric" autocomplete="off">
+          </div>
           <div class="login-error" id="loginError" style="display:none;"></div>
           <button class="btn btn-primary" style="width:100%;" onclick="handleIndexLogin()">เข้าสู่ระบบ</button>
         </div>
@@ -282,6 +290,35 @@
       localStorage.removeItem('nited_saved_login');
     }
 
+    var captchaAnswer = 0;
+
+    function generateCaptcha() {
+      var ops = ['+', '-', 'x', '/'];
+      var op = ops[Math.floor(Math.random() * ops.length)];
+      var a, b, answer;
+      if (op === '/') {
+        b = Math.floor(Math.random() * 9) + 2;
+        answer = Math.floor(Math.random() * 10) + 1;
+        a = b * answer;
+      } else if (op === 'x') {
+        a = Math.floor(Math.random() * 12) + 1;
+        b = Math.floor(Math.random() * 9) + 1;
+        answer = a * b;
+      } else if (op === '+') {
+        a = Math.floor(Math.random() * 20) + 1;
+        b = Math.floor(Math.random() * 20) + 1;
+        answer = a + b;
+      } else {
+        a = Math.floor(Math.random() * 20) + 10;
+        b = Math.floor(Math.random() * Math.min(a, 10)) + 1;
+        answer = a - b;
+      }
+      var symbols = {'+':'+','-':'-','x':'&times;','/':'&divide;'};
+      document.getElementById('captchaQuestion').innerHTML = a + ' ' + symbols[op] + ' ' + b + ' = ?';
+      captchaAnswer = answer;
+      document.getElementById('loginCaptcha').value = '';
+    }
+
     function updatePublicNavbar() {
       var isLoggedIn = checkAuth();
       var userInfoDiv = document.getElementById('userInfoDiv');
@@ -317,6 +354,14 @@
       if (!username || !password) {
         errorEl.textContent = 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
         errorEl.style.display = 'block';
+        return;
+      }
+
+      var captchaInput = document.getElementById('loginCaptcha').value.trim();
+      if (!captchaInput || parseInt(captchaInput) !== captchaAnswer) {
+        errorEl.textContent = 'คำตอบไม่ถูกต้อง กรุณาลองใหม่';
+        errorEl.style.display = 'block';
+        generateCaptcha();
         return;
       }
 
@@ -356,6 +401,9 @@
       if (e.key === 'Enter') handleIndexLogin();
     });
     document.getElementById('loginUsername').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleIndexLogin();
+    });
+    document.getElementById('loginCaptcha').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') handleIndexLogin();
     });
 
@@ -439,6 +487,7 @@
 
     // Init
     updatePublicNavbar();
+    generateCaptcha();
     loadSavedLogin();
     calendarDate = new Date();
     loadCalendarEvents('dashboardCalendar');

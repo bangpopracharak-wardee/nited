@@ -816,6 +816,39 @@ textarea.form-control {
   height: 16px;
   cursor: pointer;
 }
+
+.login-captcha { margin-bottom: 8px; }
+.login-captcha label { display: block; font-size: 13px; color: var(--text-light); margin-bottom: 4px; }
+.login-captcha .form-control { width: 120px; }
+.captcha-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.captcha-question {
+  background: #f0f4f8;
+  border: 2px dashed #1a5276;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a5276;
+  letter-spacing: 2px;
+  user-select: none;
+  min-width: 140px;
+  text-align: center;
+}
+.btn-refresh-captcha {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all .2s;
+}
+.btn-refresh-captcha:hover { background: #f0f4f8; border-color: #1a5276; }
 }
 
 .login-error {
