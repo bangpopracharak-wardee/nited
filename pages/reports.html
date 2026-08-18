@@ -368,6 +368,7 @@
       var strengths = ins['Strengths'] || '';
       var improvements = ins['Improvements'] || '';
       var suggestions = ins['Suggestions'] || '';
+      var nextFollowup = ins['Next Follow-up'] || '';
 
       var html = '';
 
@@ -455,7 +456,8 @@
       for (var i = 0; i < (suggestions ? 2 : 4); i++) html += '<div class="line"></div>';
 
       html += '<h4>นำเอาไปนิเทศครั้งต่อไป</h4>';
-      for (var i = 0; i < 4; i++) html += '<div class="line"></div>';
+      if (nextFollowup) { html += '<div style="padding:4px 0;font-size:13px;">' + escapeHtml(nextFollowup) + '</div>'; }
+      for (var i = 0; i < (nextFollowup ? 2 : 4); i++) html += '<div class="line"></div>';
 
       html += '<div class="sig-area">ลงชื่อ <span class="sig-line"></span><br>ผู้นิเทศการสอน<br>(<u>' + escapeHtml(ins['Supervisor Name']||'') + '</u>)</div>';
       html += '</div>';

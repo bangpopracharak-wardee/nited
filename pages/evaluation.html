@@ -191,6 +191,10 @@
             <label>ข้อเสนอแนะอื่นๆ</label>
             <textarea id="suggestions" rows="2" placeholder="ข้อเสนอแนะเพิ่มเติม..."></textarea>
           </div>
+          <div class="form-group">
+            <label>นำเอาไปนิเทศครั้งต่อไป</label>
+            <textarea id="nextFollowup" rows="3" placeholder="สิ่งที่จะนำเอาไปนิเทศ/ติดตามผลในครั้งต่อไป..."></textarea>
+          </div>
         </div>
       </section>
 
@@ -379,6 +383,7 @@
         strengths: document.getElementById('strengths').value.trim(),
         improvements: document.getElementById('improvements').value.trim(),
         suggestions: document.getElementById('suggestions').value.trim(),
+        nextFollowup: document.getElementById('nextFollowup').value.trim(),
         evaluatedBy: APP.user ? APP.user.fullName : ''
       };
 
@@ -395,6 +400,7 @@
           document.getElementById('strengths').value='';
           document.getElementById('improvements').value='';
           document.getElementById('suggestions').value='';
+          document.getElementById('nextFollowup').value='';
           calculateScore();
         } else {
           showToast(r.message,'error');

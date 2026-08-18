@@ -128,7 +128,7 @@ function initializeSheet(sheet, name) {
     [SHEETS.FILES]: ['Timestamp', 'Teacher Name', 'Booking ID', 'File Type', 'File Name', 'File URL', 'Drive File ID', 'Status', 'Admin Note', 'Reviewed By', 'Reviewed Date'],
     [SHEETS.EVALUATION]: ['Timestamp', 'Teacher Name', 'Supervision Date', 'Booking ID', 'Strengths', 'Improvements', 'Suggestions', 'Quality Level', 'Score', 'Evaluated By', 'Booking Reference'],
     [SHEETS.USERS]: ['Username', 'Password', 'Full Name', 'Role', 'Department', 'Active'],
-    [SHEETS.INSPECTIONS]: ['Timestamp', 'Supervision Type', 'Supervisor Name', 'Teacher Name', 'Subject Group', 'Subject Name', 'Grade Level', 'Period', 'Teaching Date', 'Topic', 'Techniques', 'Scores', 'Total Score', 'Strengths', 'Improvements', 'Suggestions', 'Evaluated By']
+    [SHEETS.INSPECTIONS]: ['Timestamp', 'Supervision Type', 'Supervisor Name', 'Teacher Name', 'Subject Group', 'Subject Name', 'Grade Level', 'Period', 'Teaching Date', 'Topic', 'Techniques', 'Scores', 'Total Score', 'Strengths', 'Improvements', 'Suggestions', 'Next Follow-up', 'Evaluated By']
   };
 
   if (headers[name]) {
@@ -634,6 +634,7 @@ function createInspection(data) {
       data.strengths || '',
       data.improvements || '',
       data.suggestions || '',
+      data.nextFollowup || '',
       data.evaluatedBy || ''
     ];
 

@@ -50,6 +50,7 @@
         <button class="tab-btn" data-tab="manageEval" onclick="switchTab('adminTab', 'manageEval')">&#11088; จัดการประเมิน</button>
         <button class="tab-btn" data-tab="printReport" onclick="switchTab('adminTab', 'printReport')">&#128424; พิมพ์รายงาน</button>
         <button class="tab-btn" data-tab="manageUsers" onclick="switchTab('adminTab', 'manageUsers');loadAdminUsers();">&#128101; จัดการผู้ใช้</button>
+        <button class="tab-btn" data-tab="settings" onclick="switchTab('adminTab', 'settings');loadSettings();">&#9881; ตั้งค่า</button>
       </div>
     </div>
 
@@ -262,6 +263,72 @@
                 <tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" data-tab-content="settings">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>&#127912; ตั้งค่าทั่วไป</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>URL Logo</label>
+              <input type="text" class="form-control" id="setLogoUrl" placeholder="https://example.com/logo.png">
+              <small style="color:#666;">ลิงก์รูปภาพโลโก้โรงเรียน</small>
+            </div>
+            <div class="form-group">
+              <label>ชื่อโรงเรียน</label>
+              <input type="text" class="form-control" id="setSchoolName" placeholder="โรงเรียนนราศึกษาธิการ">
+            </div>
+            <div class="form-group">
+              <label>ที่อยู่ (แสดงใน Footer)</label>
+              <textarea class="form-control" id="setAddress" rows="3" placeholder="123 ถ.Yii ต.YYY อ.YYY จ.นราธิวาส"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>ธีมสีหลัก</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input type="color" id="setPrimaryColor" value="#1a5276" style="width:48px;height:40px;border:1px solid #ddd;border-radius:var(--radius);cursor:pointer;">
+                  <input type="text" class="form-control" id="setPrimaryColorText" value="#1a5276" style="width:110px;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>ธีมสีรอง</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input type="color" id="setSecondaryColor" value="#e74c3c" style="width:48px;height:40px;border:1px solid #ddd;border-radius:var(--radius);cursor:pointer;">
+                  <input type="text" class="form-control" id="setSecondaryColorText" value="#e74c3c" style="width:110px;">
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary" onclick="saveSettings()">&#128190; บันทึก</button>
+              <button class="btn btn-outline" onclick="resetSettings()">&#128260; รีเซ็ต</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>&#128196; ตัวอย่าง</h3>
+          </div>
+          <div class="card-body">
+            <div id="settingsPreview" style="border:1px dashed #ddd;border-radius:var(--radius);padding:16px;">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;" id="previewHeader">
+                <div id="previewLogo" style="width:48px;height:48px;background:#eee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;">&#127891;</div>
+                <div>
+                  <div style="font-weight:600;font-size:16px;" id="previewSchoolName">โรงเรียนนราศึกษาธิการ</div>
+                  <div style="font-size:12px;color:#666;" id="previewAddress">-</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;" id="previewButtons">
+                <button class="btn btn-primary" id="previewBtnPrimary">ปุ่มหลัก</button>
+                <button class="btn btn-secondary" id="previewBtnSecondary">ปุ่มรอง</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -612,7 +679,116 @@
       }).catch(function(e){showToast('เกิดข้อผิดพลาด','error');pendingDeleteUserRow=null;});
     }
 
-    updateUserUI();initAdmin();loadAdminBookings();loadAdminFiles();loadAdminEvaluations();
+    function loadSettings() {
+      var s = JSON.parse(localStorage.getItem('nited_settings') || '{}');
+      var logo = s.logoUrl || '';
+      var name = s.schoolName || 'โรงเรียนนราศึกษาธิการ';
+      var addr = s.address || '';
+      var primary = s.primaryColor || '#1a5276';
+      var secondary = s.secondaryColor || '#e74c3c';
+      document.getElementById('setLogoUrl').value = logo;
+      document.getElementById('setSchoolName').value = name;
+      document.getElementById('setAddress').value = addr;
+      document.getElementById('setPrimaryColor').value = primary;
+      document.getElementById('setPrimaryColorText').value = primary;
+      document.getElementById('setSecondaryColor').value = secondary;
+      document.getElementById('setSecondaryColorText').value = secondary;
+      updatePreview(logo, name, addr, primary, secondary);
+    }
+
+    function updatePreview(logo, name, addr, primary, secondary) {
+      var logoEl = document.getElementById('previewLogo');
+      if (logo) {
+        logoEl.innerHTML = '<img src="' + escapeHtml(logo) + '" style="width:100%;height:100%;object-fit:contain;border-radius:50%;">';
+      } else {
+        logoEl.innerHTML = '&#127891;';
+      }
+      document.getElementById('previewSchoolName').textContent = name;
+      document.getElementById('previewAddress').textContent = addr || '-';
+      document.getElementById('previewBtnPrimary').style.background = primary;
+      document.getElementById('previewBtnPrimary').style.borderColor = primary;
+      document.getElementById('previewBtnSecondary').style.background = secondary;
+      document.getElementById('previewBtnSecondary').style.borderColor = secondary;
+    }
+
+    document.getElementById('setPrimaryColor').addEventListener('input', function() {
+      document.getElementById('setPrimaryColorText').value = this.value;
+      syncPreview();
+    });
+    document.getElementById('setPrimaryColorText').addEventListener('input', function() {
+      if (/^#[0-9a-f]{6}$/i.test(this.value)) document.getElementById('setPrimaryColor').value = this.value;
+      syncPreview();
+    });
+    document.getElementById('setSecondaryColor').addEventListener('input', function() {
+      document.getElementById('setSecondaryColorText').value = this.value;
+      syncPreview();
+    });
+    document.getElementById('setSecondaryColorText').addEventListener('input', function() {
+      if (/^#[0-9a-f]{6}$/i.test(this.value)) document.getElementById('setSecondaryColor').value = this.value;
+      syncPreview();
+    });
+    ['setLogoUrl','setSchoolName','setAddress'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', syncPreview);
+    });
+
+    function syncPreview() {
+      updatePreview(
+        document.getElementById('setLogoUrl').value.trim(),
+        document.getElementById('setSchoolName').value.trim() || 'โรงเรียนนราศึกษาธิการ',
+        document.getElementById('setAddress').value.trim(),
+        document.getElementById('setPrimaryColor').value,
+        document.getElementById('setSecondaryColor').value
+      );
+    }
+
+    function saveSettings() {
+      var settings = {
+        logoUrl: document.getElementById('setLogoUrl').value.trim(),
+        schoolName: document.getElementById('setSchoolName').value.trim() || 'โรงเรียนนราศึกษาธิการ',
+        address: document.getElementById('setAddress').value.trim(),
+        primaryColor: document.getElementById('setPrimaryColor').value,
+        secondaryColor: document.getElementById('setSecondaryColor').value
+      };
+      localStorage.setItem('nited_settings', JSON.stringify(settings));
+      applySettings(settings);
+      showToast('บันทึกสำเร็จ', 'success');
+    }
+
+    function resetSettings() {
+      if (!confirm('ต้องการรีเซ็ตการตั้งค่าทั้งหมด?')) return;
+      localStorage.removeItem('nited_settings');
+      loadSettings();
+      applySettings({});
+      showToast('รีเซ็ตแล้ว', 'success');
+    }
+
+    function applySettings(s) {
+      var primary = s.primaryColor || '#1a5276';
+      var secondary = s.secondaryColor || '#e74c3c';
+      document.documentElement.style.setProperty('--primary', primary);
+      document.documentElement.style.setProperty('--primary-hover', primary);
+      document.documentElement.style.setProperty('--secondary', secondary);
+
+      // Update navbar brand
+      var brand = document.querySelector('.navbar-brand');
+      if (brand) {
+        var logoEl = brand.querySelector('.logo');
+        if (s.logoUrl && logoEl) {
+          logoEl.innerHTML = '<img src="' + escapeHtml(s.logoUrl) + '" style="width:100%;height:100%;object-fit:contain;">';
+        }
+        var schoolEl = brand.querySelector('.brand-sub');
+        if (s.schoolName && schoolEl) schoolEl.textContent = s.schoolName;
+      }
+
+      // Update footer
+      var footer = document.querySelector('.footer');
+      if (footer && s.schoolName) {
+        footer.innerHTML = '<div class="footer-inner"><p>&copy; 2025 ' + escapeHtml(s.schoolName) + '</p>' +
+          (s.address ? '<p style="font-size:12px;opacity:0.8;">' + escapeHtml(s.address) + '</p>' : '') + '</div>';
+      }
+    }
+
+    updateUserUI();initAdmin();loadAdminBookings();loadAdminFiles();loadAdminEvaluations();loadSettings();
   </script>
 </body>
 </html>
