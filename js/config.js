@@ -8,10 +8,10 @@ const CONFIG = {
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzU2GxBp2M4LhmgC-rSg97b8Vm02GO2ZeO2KSC2gQ8FMZ5Gtzha9fxyBc7F9sk4I7dB1g/exec',
 
   // Google Sheets ID
-  SPREADSHEET_ID: '1KHJVpe1w4gRPAckL_gbs0WrGEjnDJylwny0od7jvkQM',
+  SPREADSHEET_ID: '1Uei6TXbS1Px6kPU0wXfGd511rRiYLT42e1M96mHMp-s',
 
   // Google Drive Folder ID
-  DRIVE_FOLDER_ID: '1FDj-gDOWuvq8A_kugvPrBhPZ8X4pHVUo',
+  DRIVE_FOLDER_ID: '1y24Gob6J2y4XQsgaovX01qiSUfzCN4W0',
 
   // System Info
   SCHOOL_NAME: 'โรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์',
