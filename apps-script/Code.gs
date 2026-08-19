@@ -45,13 +45,14 @@ function doOptions(e) {
 }
 
 function doGet(e) {
-  const page = e.parameter.page || 'index';
-  const template = HtmlService.createTemplateFromFile(page);
-  const html = template.evaluate()
-    .setTitle('ระบบนิเทศภายในโรงเรียนเฉลิมพระเกียรติ กรมหลวงนราธิวาสราชนครินทร์ บางปอประชารักษ์')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  return html;
+  return doPost({
+    postData: {
+      contents: JSON.stringify({
+        action: e.parameter.action || 'getDashboardData',
+        ...e.parameter
+      })
+    }
+  });
 }
 
 function doPost(e) {
